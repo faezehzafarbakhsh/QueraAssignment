@@ -22,6 +22,5 @@ CURRENT_TERM = "ترم کنونی"
 
 
 # Teacher Model
-USER_ID = "آیدی کاربر"
 LEVEL = "سطح" 
 EXPERT = "تجربه"
