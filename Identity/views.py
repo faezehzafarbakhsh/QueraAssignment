@@ -3,62 +3,44 @@ from django.shortcuts import render
 # Create your views here.
 
 
-# User Endpoints
-
-
-class user_authentication_view():
+# User Authentication Views
+class UserAuthenticationView:
     pass
 
-
-class user_change_password_view():
+class UserChangePasswordView:
     pass
 
-# It Manager Teachers Endpoints
-
-
-class teachers_retrieve_or_create_view():
+# Teacher Management Views
+class TeacherRetrieveOrCreateView:
     pass
 
-
-class teachers_update_or_destroy_view():
+class TeacherUpdateOrDestroyView:
     pass
 
-# It Manager Students Endpoints
-
-
-class students_retrieve_or_create_view():
+# Student Management Views
+class StudentRetrieveOrCreateView:
     pass
 
-
-class students_update_or_destroy_view():
+class StudentUpdateOrDestroyView:
     pass
 
-# It Manager Chancellor Endpoints
-
-
-class chancellor_retrieve_or_create_view():
+# Chancellor Management Views
+class ChancellorRetrieveOrCreateView:
     pass
 
-
-class chancellor_update_or_destroy_view():
+class ChancellorUpdateOrDestroyView:
     pass
 
-# It Manager College Endpoints
-
-
-class college_retrieve_or_create_view():
+# College Management Views
+class CollegeRetrieveOrCreateView:
     pass
 
-
-class college_update_or_destroy_view():
+class CollegeUpdateOrDestroyView:
     pass
 
-# It Manager Term Endpoints
-
-
-class term_retrieve_or_create_view():
+# Term Management Views
+class TermRetrieveOrCreateView:
     pass
 
-
-class term_update_or_destroy_view():
+class TermUpdateOrDestroyView:
     pass
