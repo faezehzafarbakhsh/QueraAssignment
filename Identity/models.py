@@ -27,7 +27,7 @@ class User(user_models.AbstractUser):
     gender = models.IntegerField(choices=GenderChoices.choices, null=True, blank=True, verbose_name=(vn_identity.GENDER))
     birth_date = jmodels.jDateField(verbose_name=(vn_identity.BIRTH_DATE)) 
     college = models.ForeignKey('EduBase.College', on_delete=models.PROTECT, verbose_name=(vn_identity.COLLEGE_ID))  
-    edu_field = models.ForeignKey('EduBase.EduField', on_delete=models.PROTECT, verbose_name=(vn_identity.EDU_FIELD_ID))  
+    edu_field = models.ForeignKey('EduBase.EduField', on_delete=models.PROTECT, verbose_name=(vn_identity.EDU_FIELD_ID) , related_name="users")  
     is_it_manager = models.BooleanField(default=False, verbose_name=(vn_identity.IS_IT_MANAGER))  
     is_chancellor = models.BooleanField(default=False, verbose_name=(vn_identity.IS_CHANCELLOR))  
     national_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=(vn_identity.NATIONAL_CODE))
@@ -50,19 +50,19 @@ class Student(models.Model):
         YES = 1 , (vn_identity.YES)
         NO = 2 , (vn_identity.NO)
 
-    user = models.ForeignKey(get_user_model() , on_delete=models.PROTECT , verbose_name = (vn_identity.USER_ID))
+    user = models.ForeignKey(get_user_model() , on_delete=models.PROTECT , verbose_name = (vn_identity.USER_ID) , related_name="students")
     entry_year = jmodels.jDateField(verbose_name=(vn_identity.ENTRY_YEAR))
     entry_term= models.IntegerField(choices = EntryChoices.choices , verbose_name=(vn_identity.ENTRY_TERM))
-    average = models.models.FloatField(verbose_name=(vn_identity.AVERAGE))
+    average = models.FloatField(verbose_name=(vn_identity.AVERAGE))
     academic_year= models.IntegerField(choices = AcademicChoices.choices , verbose_name=(vn_identity.ACADEMIC_YEAR))
-    current_term = models.ForeignKey("EduTerm", on_delete=models.PROTECT, verbose_name=(vn_identity.CURRENT_TERM))
+    current_term = models.ForeignKey("EduTerm", on_delete=models.PROTECT, verbose_name=(vn_identity.CURRENT_TERM),related_name="students")
 
 class TeacherManager(models.Manager):
     pass
 
 
 class Teacher(models.Model):
-    user = models.ForeignKey(get_user_model() , on_delete=models.PROTECT , verbose_name = (vn_identity.USER_ID))
+    user = models.ForeignKey(get_user_model() , on_delete=models.PROTECT , verbose_name = (vn_identity.USER_ID), related_name="teachers")
     level = models.CharField(verbose_name=(vn_identity.LEVEL), max_length=64)
     expert = models.CharField(verbose_name=(vn_identity.EXPERT), max_length=64)
 
