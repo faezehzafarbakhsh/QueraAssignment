@@ -24,3 +24,10 @@ CURRENT_TERM = "ترم کنونی"
 # Teacher Model
 LEVEL = "سطح" 
 EXPERT = "تجربه"
+
+YES = "بله"
+NO = "نه"
+MALE = "مرد"
+FEMALE ="زن"
+DUTIABLE = "مشول به خدمت"
+EXEMPT = "معاف از خدمت"

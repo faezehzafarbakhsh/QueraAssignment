@@ -1,10 +1,9 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth import models as user_models
 
+from django.db import models 
 import variable_names as vn_identity 
 from django_jalali.db import models as jmodels
 from django.contrib.auth import get_user_model
-from django.db import models 
-from django.contrib.auth import models as user_models
 from django.utils.translation import gettext_lazy as _
 # Create your user_models here.
 
@@ -13,15 +12,15 @@ class UserManager(models.Manager):
     pass
 
 
-class User(AbstractUser):
+class User(user_models.AbstractUser):
     
     class GenderChoices(models.IntegerChoices):
-        MALE = 1, _('مرد')
-        FEMALE = 2, _('زن')
+        MALE = 1, _(vn_identity.MALE)
+        FEMALE = 2, _(vn_identity.FEMALE)
         
     class MilitaryChoices(models.IntegerChoices):
-        MALE = 1, _('مشمول به خدمت')
-        FEMALE = 2, _('معاف از خدمت')
+        DUTIABLE  = 1, _(vn_identity.DUTIABLE)
+        EXEMPT = 2, _(vn_identity.EXEMPT)
 
     portrait = models.ImageField(upload_to='images/', null=True, blank=True, verbose_name=_(vn_identity.PORTRAIT))
     mobile = models.CharField(max_length=11, null=True, blank=True, verbose_name=_(vn_identity.MOBILE))
@@ -41,15 +40,15 @@ class StudentManager(models.Manager):
     pass
 
 
-class Student(user_models.Model):
+class Student(models.Model):
 
     class AcademicChoices(models.IntegerChoices):
-        YES = 1 , _("بله")
-        NO = 2 , _("خیر")
+        YES = 1 , _(vn_identity.YES)
+        NO = 2 , _(vn_identity.NO)
     
     class EntryChoices(models.IntegerChoices):
-        YES = 1 , _("بله")
-        NO = 2 , _("خیر")
+        YES = 1 , _(vn_identity.YES)
+        NO = 2 , _(vn_identity.NO)
 
     user_id = models.ForeignKey(get_user_model() , on_delete=models.PROTECT , verbose_name = _(vn_identity.USER_ID))
     entry_year = jmodels.jDateField(verbose_name=_(vn_identity.ENTRY_YEAR))
@@ -62,7 +61,7 @@ class TeacherManager(models.Manager):
     pass
 
 
-class Teacher(user_models.Model):
+class Teacher(models.Model):
     user_id = models.ForeignKey(get_user_model() , on_delete=models.PROTECT , verbose_name = _(vn_identity.USER_ID))
     level = models.CharField(verbose_name=_(vn_identity.LEVEL), max_length=64)
     expert = models.CharField(verbose_name=_(vn_identity.EXPERT), max_length=64)
