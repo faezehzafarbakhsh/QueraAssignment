@@ -1,5 +1,4 @@
 from django.utils.translation import gettext_lazy as _
-COLLEGE_NAME = _('نام دانشکده')
 # StudentRequest :
 STUDENT_REQUEST_STUDENT = _('دانشجو')
 STUDENT_REQUEST_TERM = _('ترم')
