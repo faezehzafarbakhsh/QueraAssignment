@@ -1,15 +1,20 @@
+from django.utils.translation import gettext_lazy as _
+COLLEGE_NAME= _('نام دانشکده')
 # StudentRequest : 
-
-STUDENT = 'دانشجو'
-TERM = 'ترم'
-COURSE_TERM = 'درس ترمی'
-REQUEST_DESCRIPTION = 'توضیحات درخواست'
-ANSWER = 'پاسخ'
-STATUS = None
-HAS_ACADEMIC_YEAR = 'دارای سنوات تحصیلی'
-USER_ANSWER = 'توضیحات معاون آموزشی'
-REQUEST_TYPE = None
+STUDENT_REQUEST_STUDENT = _('دانشجو')
+STUDENT_REQUEST_TERM = _('ترم')
+STUDENT_REQUEST_COURSE_TERM = _('درس ترمی')
+STUDENT_REQUEST_REQUEST_DESCRIPTION = _('توضیحات درخواست')
+STUDENT_REQUEST_ANSWER = _('پاسخ')
+STUDENT_REQUEST_STATUS = _('وضعیت')
+STUDENT_REQUEST_HAS_ACADEMIC_YEAR = _('دارای سنوات تحصیلی')
+STUDENT_REQUEST_USER_ANSWER = _('توضیحات معاون آموزشی')
+STUDENT_REQUEST_REQUEST_TYPE = _('نوع درخواست')
 
 
 # EnrollmentCertificate
-ENROLLMENT_CERTIFICATE_PLACE = None
+ENROLLMENTCERTIFICATE_STUDENT = _('دانشجو')
+ENROLLMENTCERTIFICATE_TERM = _('ترم تحصیلی')
+ENROLLMENTCERTIFICATE_CERTIFICATE_PLACE = _('محل صدور گواهی')
+
+
