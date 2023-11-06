@@ -6,3 +6,18 @@ from django.shortcuts import render
 class StudentRequestListView():
     pass
 
+
+class StudentRequestCreateView():
+    pass
+
+
+class StudentRequestDeleteView():
+    pass
+
+
+class StudentRequestUpdateView():
+    pass
+
+
+class EnrollmentCertificateListView():
+    pass
