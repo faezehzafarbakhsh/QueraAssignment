@@ -1,55 +1,84 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.utils.translation import gettext_lazy as _
 from django.db import models
 from EduBase import variable_names as vn_edu_base
 
-"""درمورد مقاطع و رشته تحصیلی هست
-"""
+
+class EduFieldManager(models.Manager):
+    pass
 
 
 class EduField(models.Model):
+    """
+    درمورد مقاطع و رشته تحصیلی هست
+    """
     class EduGradeChoices(models.IntegerChoices):
-        AssociateDegree = 1, _("کاردانی")
-        Undergraduate = 2, _("کارشناسی")
-        MastersDegree = 3, _("کارشناسی ارشد")
-        PHD = 4, _("دکتری")
+        AssociateDegree = 1, vn_edu_base.EDU_GRADE_ASSOCIATE_DEGREE
+        Undergraduate = 2, vn_edu_base.EDU_GRADE_UNDER_GRADUATE
+        MastersDegree = 3, vn_edu_base.EDU_GRADE_MASTERS_DEGREE
+        PHD = 4, vn_edu_base.EDU_GRADE_PHD
 
-    name = models.CharField(max_length=64, verbose_name=vn_edu_base.EDUFIELD_NAME)
-    edu_group = models.CharField(max_length=64, verbose_name=vn_edu_base.EDUFIELD_EDU_GROUP)
-    unit_count = models.IntegerField(default=1, validators=[MaxValueValidator(999), MinValueValidator(1)], verbose_name=vn_edu_base.EDUFIELD_UNIT_COUNT)
-    edu_grade = models.IntegerField(choices=EduGradeChoices.choices, verbose_name=vn_edu_base.EDUFIELD_EDU_GRADE)
+    name = models.CharField(max_length=64, verbose_name=vn_edu_base.EDU_FIELD_NAME,)
+    edu_group = models.CharField(max_length=64, verbose_name=vn_edu_base.EDU_FIELD_EDU_GROUP)
+    unit_count = models.IntegerField(default=1, validators=[MaxValueValidator(999), MinValueValidator(1)], verbose_name=vn_edu_base.EDU_FIELD_UNIT_COUNT)
+    edu_grade = models.IntegerField(choices=EduGradeChoices.choices, verbose_name=vn_edu_base.EDU_FIELD_EDU_GRADE)
+
+    objects = EduFieldManager()
 
 
-"""در مورد درس ها و دانشگاههایی که اون درس رو ارایه میده 
-"""
+class CourseManager(models.Manager):
+    pass
 
 
 class Course(models.Model):
+    """
+    در مورد درس ها و دانشگاههایی که اون درس رو ارایه میده
+    """
     class CourseTypeChoices(models.IntegerChoices):
-        General = 1, _("عمومی")
-        Specialized = 2, _("تخصصی")
-        Basic = 3, _("پایه")
-        Optional = 4, _("اختیاری")
+        General = 1, vn_edu_base.COURSE_TYPE_GENERAL
+        Specialized = 2, vn_edu_base.COURSE_TYPE_SPECIALIZED
+        Basic = 3, vn_edu_base.COURSE_TYPE_BASIC
+        Optional = 4, vn_edu_base.COURSE_TYPE_OPTIONAL
 
     name = models.CharField(max_length=64, verbose_name=vn_edu_base.COURSE_NAME)
-    college = models.ForeignKey('EduBase.College', on_delete=models.PROTECT, related_name='courses', verbose_name=vn_edu_base.COURSE_COLLEGE)
+    college = models.ForeignKey('EduBase.College', on_delete=models.PROTECT, related_name='courses',
+                                verbose_name=vn_edu_base.COURSE_COLLEGE)
     unit_count = models.IntegerField(verbose_name=vn_edu_base.COURSE_UNIT_COUNT)
     course_type = models.IntegerField(choices=CourseTypeChoices.choices, verbose_name=vn_edu_base.COURSE_COURSE_TYPE)
 
+    objects = CourseManager()
 
-"""در مورد هم نیاز و پیش نیاز و رابطه ای که درس ها باهم دارند
-"""
+
+class CourseRelationManager(models.Manager):
+    pass
 
 
 class CourseRelation(models.Model):
-    class RelationTypeChoices(models.IntegerChoices):
-        TheNeed = 1, _("هم نیاز")
-        prerequisite = 2, _("پیش نیاز")
+    """
+    در مورد هم نیاز و پیش نیاز و رابطه ای که درس ها باهم دارند
+    """
 
-    primary_course = models.ForeignKey('EduBase.Course', on_delete=models.PROTECT, related_name='course_relation_primary_courses', verbose_name=vn_edu_base.COURSERELATION_PRIMARY_COURSE)
-    secondary_course = models.ForeignKey('EduBase.Course', on_delete=models.PROTECT, related_name='course_relation_secondary_courses', verbose_name=vn_edu_base.COURSERELATION_SECONDARY_COURSE)
-    relation_type = models.IntegerField(choices=RelationTypeChoices.choices, verbose_name=vn_edu_base.COURSERELATION_RELATION_TYPE)
+    class RelationTypeChoices(models.IntegerChoices):
+        SIMULTANEOUS_REQUISITE = 1, vn_edu_base.RELATION_TYPE_SIMULTANEOUS_REQUISITE
+        PRE_REQUISITE = 2, vn_edu_base.RELATION_TYPE_PRE_REQUISITE
+
+    primary_course = models.ForeignKey('EduBase.Course', on_delete=models.PROTECT,
+                                       related_name='course_relation_primary_courses',
+                                       verbose_name=vn_edu_base.COURSE_RELATION_PRIMARY_COURSE)
+    secondary_course = models.ForeignKey('EduBase.Course', on_delete=models.PROTECT,
+                                         related_name='course_relation_secondary_courses',
+                                         verbose_name=vn_edu_base.COURSE_RELATION_SECONDARY_COURSE)
+    relation_type = models.IntegerField(choices=RelationTypeChoices.choices,
+                                        verbose_name=vn_edu_base.COURSE_RELATION_RELATION_TYPE)
+
+    objects = CourseRelationManager()
+
+
+class CollegeManager(models.Manager):
+    pass
 
 
 class College(models.Model):
     name = models.CharField(max_length=64, verbose_name=vn_edu_base.COLLEGE_NAME)
+
+    objects = CollegeManager()
+
