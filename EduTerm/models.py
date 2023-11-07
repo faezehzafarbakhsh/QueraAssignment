@@ -1,6 +1,7 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django_jalali.db import models as jmodels
-import variable_names as vn_EduTerm
+import variable_names as vn_edu_term
 
 
 '''
@@ -13,24 +14,17 @@ class TermManager(models.manager):
 
 
 class Term(models.Model):
-    name = models.CharField(max_length=64, verbose_name=vn_EduTerm.NAME)
-    enrollment_start_datetime = jmodels.jdatetime(
-        verbose_name=vn_EduTerm.ENROLLMENT_START_DATETIME)
-    enrollment_end_datetime = jmodels.jdatetime(
-        verbose_name=vn_EduTerm.ENROLLMENT_END_DATETIME)
-    class_start_datetime = jmodels.jdatetime(
-        verbose_name=vn_EduTerm.CLASS_START_DATETIME)
-    class_end_datetime = jmodels.jdatetime(
-        verbose_name=vn_EduTerm.CLASS_END_DATETIME)
-    modify_start_datetime = jmodels.jdatetime(
-        verbose_name=vn_EduTerm.MODIFY_START_DATETIME)
-    modify_end_datetime = jmodels.jdatetime(
-        verbose_name=vn_EduTerm.MODIFY_END_DATETIME)
-    emergency_course_drop_end_datetime = jmodels.jdatetime(
-        verbose_name=vn_EduTerm.EMERGENCY_COURSE_DROP_END_DATETIME)
-    exam_start_date = jmodels.jDateField(
-        verbose_name=vn_EduTerm.EXAM_START_DATE)
-    term_end_date = jmodels.jDateField(verbose_name=vn_EduTerm.TERM_END_DATE)
+    name = models.CharField(max_length=64, verbose_name=vn_edu_term.TERM_NAME)
+    enrollment_start_datetime = jmodels.jDateTimeField(verbose_name=vn_edu_term.TERM_ENROLLMENT_START_DATETIME)
+    enrollment_end_datetime = jmodels.jDateTimeField(verbose_name=vn_edu_term.TERM_ENROLLMENT_END_DATETIME)
+    class_start_datetime = jmodels.jDateTimeField(verbose_name=vn_edu_term.TERM_CLASS_START_DATETIME)
+    class_end_datetime = jmodels.jDateTimeField(verbose_name=vn_edu_term.TERM_CLASS_END_DATETIME)
+    modify_start_datetime = jmodels.jDateTimeField(verbose_name=vn_edu_term.TERM_MODIFY_START_DATETIME)
+    modify_end_datetime = jmodels.jDateTimeField(verbose_name=vn_edu_term.TERM_MODIFY_END_DATETIME)
+    emergency_course_drop_end_datetime = jmodels.jDateTimeField(
+        verbose_name=vn_edu_term.TERM_EMERGENCY_COURSE_DROP_END_DATETIME)
+    exam_start_date = jmodels.jDateField(verbose_name=vn_edu_term.TERM_EXAM_START_DATE)
+    term_end_date = jmodels.jDateField(verbose_name=vn_edu_term.TERM_TERM_END_DATE)
 
 
 class CourseTermManager(models.manager):
@@ -38,15 +32,11 @@ class CourseTermManager(models.manager):
 
 
 class CourseTerm(models.Model):
-    course = models.ForeignKey(
-        "EduBase.Course", verbose_name=vn_EduTerm.COURSE, on_delete=models.PROTECT)
-    term = models.ForeignKey(
-        "EduTerm.Term", verbose_name=vn_EduTerm.TERM, on_delete=models.PROTECT)
-    class_day = jmodels.jDateField(verbose_name=vn_EduTerm.CLASS_DAY)
-    class_time = jmodels.jdatetime(verbose_name=vn_EduTerm.CLASS_TIME)
-    exam_datetime = jmodels.jdatetime(verbose_name=vn_EduTerm.EXAM_DATETIME)
-    exam_place = models.CharField(
-        max_length=128, verbose_name=vn_EduTerm.EXAM_PLACE)
-    teacher = models.ForeignKey(
-        "Identity.User", verbose_name=vn_EduTerm.TEACHER, on_delete=models.PROTECT)
-    capacity = models.IntegerField(verbose_name=vn_EduTerm.CAPACITY)
+    course = models.ForeignKey("EduBase.Course", verbose_name=vn_edu_term.COURSE_TERM_COURSE, on_delete=models.PROTECT)
+    term = models.ForeignKey("EduTerm.Term", verbose_name=vn_edu_term.COURSE_TERM_TERM, on_delete=models.PROTECT)
+    class_day = jmodels.jDateField(verbose_name=vn_edu_term.COURSE_TERM_CLASS_DAY)
+    class_time = jmodels.jDateTimeField(verbose_name=vn_edu_term.COURSE_TERM_CLASS_TIME)
+    exam_datetime = jmodels.jDateTimeField(verbose_name=vn_edu_term.COURSE_TERM_EXAM_DATETIME)
+    exam_place = models.CharField(max_length=128, verbose_name=vn_edu_term.COURSE_TERM_EXAM_PLACE)
+    teacher = models.ForeignKey(get_user_model(), verbose_name=vn_edu_term.COURSE_TERM_TEACHER, on_delete=models.PROTECT)
+    capacity = models.IntegerField(verbose_name=vn_edu_term.COURSE_TERM_CAPACITY)

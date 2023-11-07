@@ -1,23 +1,23 @@
 from django.utils.translation import gettext_lazy as _
 # TERM
-NAME = 'اسم'
-ENROLLMENT_START_DATETIME = _('تاریخ شروع انتخاب واحد')
-ENROLLMENT_END_DATETIME = _('تاریخ پایان انتخاب واحد')
-CLASS_START_DATETIME = _('تاریخ شروع کلاس ها')
-CLASS_END_DATETIME = _('تاریخ پایان کلاس ها')
-MODIFY_START_DATETIME = _('تاریخ شروع حذف واضافه')
-MODIFY_END_DATETIME = _('تاریخ پایان حذف و اضافه')
-EMERGENCY_COURSE_DROP_END_DATETIME = _('زمان حذف اضطراری')
-EXAM_START_DATE = _(' تاریخ شروع امتحان ها')
-TERM_END_DATE = _('پایان ترم')
+TERM_NAME = 'اسم'
+TERM_ENROLLMENT_START_DATETIME = _('تاریخ شروع انتخاب واحد')
+TERM_ENROLLMENT_END_DATETIME = _('تاریخ پایان انتخاب واحد')
+TERM_CLASS_START_DATETIME = _('تاریخ شروع کلاس‌ها')
+TERM_CLASS_END_DATETIME = _('تاریخ پایان کلاس‌ها')
+TERM_MODIFY_START_DATETIME = _('تاریخ شروع حذف واضافه')
+TERM_MODIFY_END_DATETIME = _('تاریخ پایان حذف و اضافه')
+TERM_EMERGENCY_COURSE_DROP_END_DATETIME = _('زمان حذف اضطراری')
+TERM_EXAM_START_DATE = _(' تاریخ شروع امتحان‌ها')
+TERM_TERM_END_DATE = _('پایان ترم')
 
 
 # CourseTerm
-COURSE = _('درس')
-TERM = _('ترم')
-CLASS_DAY = _('روز کلاس')
-CLASS_TIME = _('زمان کلاس')
-EXAM_DATETIME = _('تاریخ امتحان')
-EXAM_PLACE = _('مکان امتحان')
-TEACHER = _('استاد')
-CAPACITY = _('ظرفیت')
+COURSE_TERM_COURSE = _('درس')
+COURSE_TERM_TERM = _('ترم')
+COURSE_TERM_CLASS_DAY = _('روز کلاس')
+COURSE_TERM_CLASS_TIME = _('زمان کلاس')
+COURSE_TERM_EXAM_DATETIME = _('تاریخ امتحان')
+COURSE_TERM_EXAM_PLACE = _('مکان امتحان')
+COURSE_TERM_TEACHER = _('استاد')
+COURSE_TERM_CAPACITY = _('ظرفیت')
