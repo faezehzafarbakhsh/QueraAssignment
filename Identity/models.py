@@ -19,36 +19,40 @@ def user_portrait_dir_path(instance, file_name):
         suffix=file_name.split(".")[-1],
     )
 
+
 class UserManager(models.Manager):
     pass
 
 
 class User(user_models.AbstractUser):
-
     class GenderChoices(models.IntegerChoices):
         MALE = 1, vn_identity.MALE
         FEMALE = 2, vn_identity.FEMALE
 
     class MilitaryChoices(models.IntegerChoices):
-        DUTIABLE = 1, vn_identity.DUTIABLE
-        EXEMPT = 2, vn_identity.EXEMPT
-
+        END_OF_SERVICE_CARD = 1, vn_identity.END_OF_SERVICE_CARD
+        MEDICAL_EXEMPTION = 2, vn_identity.MEDICAL_EXEMPTION
+        NON_MEDICAL_EXEMPTION = 3, vn_identity.NON_MEDICAL_EXEMPTION
+        EDUCATIONAL_EXEMPTION = 4, vn_identity.EDUCATIONAL_EXEMPTION
+        CURRENTLY_IN_SERVICE = 5, vn_identity.CURRENTLY_IN_SERVICE 
+        
     portrait = models.ImageField(upload_to=user_portrait_dir_path, null=True, blank=True,
-                                 verbose_name=vn_identity.PORTRAIT)
+                                 verbose_name=vn_identity.USER_PORTRAIT)
     mobile = models.CharField(max_length=11, null=True, blank=True, verbose_name=vn_identity.USER_MOBILE)
-    gender = models.IntegerField(choices=GenderChoices.choices, null=True, blank=True,
-                                 verbose_name=vn_identity.USER_GENDER)
+    national_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=vn_identity.USER_NATIONAL_CODE)
+    gender = models.IntegerField(choices=GenderChoices.choices, verbose_name=vn_identity.USER_GENDER)
     birth_date = jmodels.jDateField(verbose_name=vn_identity.USER_BIRTH_DATE)
-    college = models.ForeignKey('EduBase.College', on_delete=models.PROTECT, verbose_name=vn_identity.USER_COLLEGE)
-    edu_field = models.ForeignKey('EduBase.EduField', on_delete=models.PROTECT, verbose_name=vn_identity.USER_EDU_FIELD,
-                                  related_name="users")
+    # college = models.ForeignKey('EduBase.College', on_delete=models.PROTECT, null=True, blank=True,
+    #                             verbose_name=vn_identity.USER_COLLEGE)
+    # edu_field = models.ForeignKey('EduBase.EduField', on_delete=models.PROTECT, null=True, blank=True,
+    #                               verbose_name=vn_identity.USER_EDU_FIELD, related_name="users")
     is_it_manager = models.BooleanField(default=False, verbose_name=vn_identity.USER_IS_IT_MANAGER)
     is_chancellor = models.BooleanField(default=False, verbose_name=vn_identity.USER_IS_CHANCELLOR)
-    national_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=vn_identity.USER_NATIONAL_CODE)
     is_student = models.BooleanField(default=False, verbose_name=vn_identity.USER_IS_STUDENT)
     is_teacher = models.BooleanField(default=False, verbose_name=vn_identity.USER_IS_TEACHER)
     military_service = models.IntegerField(choices=MilitaryChoices.choices, null=True, blank=True,
                                            verbose_name=vn_identity.USER_MILITARY_SERVICE)
+    objects = UserManager()
 
 
 class StudentManager(models.Manager):
@@ -56,7 +60,6 @@ class StudentManager(models.Manager):
 
 
 class Student(models.Model):
-
     class AcademicChoices(models.IntegerChoices):
         YES = 1, vn_identity.YES
         NO = 2, vn_identity.NO
@@ -66,15 +69,16 @@ class Student(models.Model):
         NO = 2, vn_identity.NO
 
     user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT,
-                             verbose_name=vn_identity.USER_ID, related_name="students")
-    entry_year = jmodels.jDateField(verbose_name=vn_identity.ENTRY_YEAR)
+                             verbose_name=vn_identity.STUDENT_USER, related_name="students")
+    entry_year = jmodels.jDateField(verbose_name=vn_identity.STUDENT_ENTRY_YEAR)
     entry_term = models.IntegerField(
-        choices=EntryChoices.choices, verbose_name=vn_identity.ENTRY_TERM)
-    average = models.FloatField(verbose_name=vn_identity.AVERAGE)
-    academic_year = models.IntegerField(
-        choices=AcademicChoices.choices, verbose_name=vn_identity.ACADEMIC_YEAR)
-    current_term = models.ForeignKey(
-        "EduTerm", on_delete=models.PROTECT, verbose_name=vn_identity.CURRENT_TERM, related_name="students")
+        choices=EntryChoices.choices, verbose_name=vn_identity.STUDENT_ENTRY_TERM)
+    current_term = models.ForeignKey("EduTerm.Term", on_delete=models.PROTECT,
+                                     verbose_name=vn_identity.STUDENT_CURRENT_TERM, related_name="students")
+    average = models.FloatField(verbose_name=vn_identity.STUDENT_AVERAGE)
+    academic_year = models.IntegerField(choices=AcademicChoices.choices, verbose_name=vn_identity.STUDENT_ACADEMIC_YEAR)
+
+    objects = StudentManager()
 
 
 class TeacherManager(models.Manager):
@@ -82,7 +86,9 @@ class TeacherManager(models.Manager):
 
 
 class Teacher(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT,
-                             verbose_name=vn_identity.USER_ID, related_name="teachers")
-    level = models.CharField(verbose_name=vn_identity.LEVEL, max_length=64)
-    expert = models.CharField(verbose_name=vn_identity.EXPERT, max_length=64)
+    user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT, verbose_name=vn_identity.TEACHER_USER,
+                             related_name="teachers")
+    level = models.CharField(verbose_name=vn_identity.TEACHER_LEVEL, max_length=64)
+    expert = models.CharField(verbose_name=vn_identity.TEACHER_EXPERT, max_length=64)
+
+    objects = TeacherManager()
