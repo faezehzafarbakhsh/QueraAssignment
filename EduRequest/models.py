@@ -2,7 +2,6 @@ from django.db import models
 from django.db.models import Q
 
 import variable_names as vn_edu_request
-from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 
 
@@ -14,17 +13,17 @@ class StudentRequestManager(models.Manager):
 
 class StudentRequest(models.Model):
     class StatusChoices(models.IntegerChoices):
-        ACCEPT = _('پذیرش')
-        DENIED = _('رد شده')
-        IN_PROGRESS = _('در حال بررسی')
+        ACCEPT = vn_edu_request.ACCEPT
+        DENIED =  vn_edu_request.DENIED
+        IN_PROGRESS =  vn_edu_request.IN_PROGRESS
 
     class RequestTypeChoices(models.IntegerChoices):
-        Late_Add_drop = _('درخواست حذف و اضافه')
-        EMPLOYMENT_IN_EDUCATION = _('درخواست اشتغال به تحصیل')
-        REGISTERING = _("درخواست ثبت نام")
-        APPEAL = _('درخواست تجدید نظر')
-        DELETE_STUDENT_SEMESTER = _('درخواست حذف ترم')
-        STUDENT_EMERGENCY_REMOVAL = _("درخواست حذف اضطراری دانشجو")
+        Late_Add_drop = vn_edu_request.Late_Add_drop
+        EMPLOYMENT_IN_EDUCATION = vn_edu_request.EMPLOYMENT_IN_EDUCATION
+        REGISTERING = vn_edu_request.REGISTERING
+        APPEAL = vn_edu_request.APPEAL
+        DELETE_STUDENT_SEMESTER = vn_edu_request.DELETE_STUDENT_SEMESTER
+        STUDENT_EMERGENCY_REMOVAL = vn_edu_request.STUDENT_EMERGENCY_REMOVAL
 
     student = models.ForeignKey(get_user_model(), on_delete=models.PROTECT,
                                 verbose_name=vn_edu_request.STUDENT_REQUEST_STUDENT)
