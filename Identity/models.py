@@ -44,10 +44,10 @@ class User(user_models.AbstractUser):
     national_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=vn_identity.USER_NATIONAL_CODE)
     gender = models.IntegerField(choices=GenderChoices.choices, verbose_name=vn_identity.USER_GENDER)
     birth_date = jmodels.jDateField(verbose_name=vn_identity.USER_BIRTH_DATE)
-    # college = models.ForeignKey('EduBase.College', on_delete=models.PROTECT, null=True, blank=True,
-    #                             verbose_name=vn_identity.USER_COLLEGE, related_name="users")
-    # edu_field = models.ForeignKey('EduBase.EduField', on_delete=models.PROTECT, null=True, blank=True,
-    #                               verbose_name=vn_identity.USER_EDU_FIELD, related_name="users")
+    college = models.ForeignKey('EduBase.College', on_delete=models.PROTECT, null=True, blank=True,
+                                verbose_name=vn_identity.USER_COLLEGE, related_name="users")
+    edu_field = models.ForeignKey('EduBase.EduField', on_delete=models.PROTECT, null=True, blank=True,
+                                  verbose_name=vn_identity.USER_EDU_FIELD, related_name="users")
     is_it_manager = models.BooleanField(default=False, verbose_name=vn_identity.USER_IS_IT_MANAGER)
     is_chancellor = models.BooleanField(default=False, verbose_name=vn_identity.USER_IS_CHANCELLOR)
     is_student = models.BooleanField(default=False, verbose_name=vn_identity.USER_IS_STUDENT)
