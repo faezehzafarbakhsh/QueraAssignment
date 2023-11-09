@@ -47,7 +47,7 @@ DJANGO_APPS = [
 ]
 
 OTHER_APPS = [
-
+    "rest_framework"
 ]
 
 PROJECT_APPS = [
@@ -76,8 +76,7 @@ ROOT_URLCONF = 'QueraPyRate.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': []
-        ,
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -153,3 +152,11 @@ NUMBER_GROUPING = int(os.environ.get("NUMBER_GROUPING"))
 
 AUTH_USER_MODEL = 'Identity.User'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
