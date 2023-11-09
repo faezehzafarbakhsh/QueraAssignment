@@ -1,6 +1,7 @@
 import uuid
 
 from django.contrib.auth import models as user_models
+from django.contrib.auth.base_user import BaseUserManager
 
 from django.db import models
 from django.db.models import Q
@@ -22,7 +23,7 @@ def user_portrait_dir_path(instance, file_name):
     )
 
 
-class UserManager(models.Manager):
+class UserManager(BaseUserManager):
     pass
 
 
