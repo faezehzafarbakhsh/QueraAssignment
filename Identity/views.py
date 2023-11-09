@@ -1,4 +1,9 @@
-from django.shortcuts import render
+from .models import User , Teacher
+from rest_framework import generics
+from .identity_serializers import TeacherSerializer
+from rest_framework.response import Response
+from rest_framework import status
+
 
 # Create your views here.
 
@@ -7,40 +12,81 @@ from django.shortcuts import render
 class UserAuthenticationView:
     pass
 
+
 class UserChangePasswordView:
     pass
 
 # Teacher Management Views
-class TeacherRetrieveOrCreateView:
-    pass
 
-class TeacherUpdateOrDestroyView:
-    pass
+
+class TeacherListCreateApiView(generics.ListCreateAPIView):
+    serializer_class = TeacherSerializer
+    queryset = Teacher.objects.all()
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        teacher = serializer.save()
+        return Response({
+            "teacher": TeacherSerializer(teacher).data
+        })
+
+class TeacherRetrieveOrRetrieveOrUpdateOrDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Teacher.objects.all()
+    serializer_class = TeacherSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'message': 'Teacher updated successfully.'})
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response({'message': 'Teacher deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
 
 # Student Management Views
-class StudentRetrieveOrCreateView:
+class StudentListOrCreateView:
     pass
 
-class StudentUpdateOrDestroyView:
+
+class StudentRetrieveOrUpdateOrDestroyView:
     pass
 
 # Chancellor Management Views
-class ChancellorRetrieveOrCreateView:
+
+
+class ChancellorListOrCreateView:
     pass
 
-class ChancellorUpdateOrDestroyView:
+
+class ChancellorRetrieveOrUpdateOrDestroyView:
     pass
 
 # College Management Views
-class CollegeRetrieveOrCreateView:
+
+
+class CollegeListOrCreateView:
     pass
 
-class CollegeUpdateOrDestroyView:
+
+class CollegeRetrieveOrUpdateOrDestroyView:
     pass
 
 # Term Management Views
-class TermRetrieveOrCreateView:
+
+
+class TermListOrCreateView:
     pass
 
-class TermUpdateOrDestroyView:
+
+class TermRetrieveOrUpdateOrDestroyView:
     pass
