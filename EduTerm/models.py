@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models import Q
 from django_jalali.db import models as jmodels
-import variable_names as vn_edu_term
+from EduTerm import variable_names as vn_edu_term
 
 
 '''
@@ -9,7 +10,7 @@ TERM MODEL
 '''
 
 
-class TermManager(models.manager):
+class TermManager(models.Manager):
     pass
 
 
@@ -26,17 +27,25 @@ class Term(models.Model):
     exam_start_date = jmodels.jDateField(verbose_name=vn_edu_term.TERM_EXAM_START_DATE)
     term_end_date = jmodels.jDateField(verbose_name=vn_edu_term.TERM_TERM_END_DATE)
 
+    objects = TermManager()
 
-class CourseTermManager(models.manager):
+
+class CourseTermManager(models.Manager):
     pass
 
 
 class CourseTerm(models.Model):
-    course = models.ForeignKey("EduBase.Course", verbose_name=vn_edu_term.COURSE_TERM_COURSE, on_delete=models.PROTECT)
-    term = models.ForeignKey("EduTerm.Term", verbose_name=vn_edu_term.COURSE_TERM_TERM, on_delete=models.PROTECT)
+    course = models.ForeignKey("EduBase.Course", verbose_name=vn_edu_term.COURSE_TERM_COURSE, on_delete=models.PROTECT,
+                               related_name='course_terms')
+    term = models.ForeignKey("EduTerm.Term", verbose_name=vn_edu_term.COURSE_TERM_TERM, on_delete=models.PROTECT,
+                             related_name='course_terms')
     class_day = jmodels.jDateField(verbose_name=vn_edu_term.COURSE_TERM_CLASS_DAY)
     class_time = jmodels.jDateTimeField(verbose_name=vn_edu_term.COURSE_TERM_CLASS_TIME)
     exam_datetime = jmodels.jDateTimeField(verbose_name=vn_edu_term.COURSE_TERM_EXAM_DATETIME)
     exam_place = models.CharField(max_length=128, verbose_name=vn_edu_term.COURSE_TERM_EXAM_PLACE)
-    teacher = models.ForeignKey(get_user_model(), verbose_name=vn_edu_term.COURSE_TERM_TEACHER, on_delete=models.PROTECT)
+    teacher = models.ForeignKey(get_user_model(), verbose_name=vn_edu_term.COURSE_TERM_TEACHER,
+                                on_delete=models.PROTECT, related_name='course_terms',
+                                limit_choices_to=Q(is_teacher=True))
     capacity = models.IntegerField(verbose_name=vn_edu_term.COURSE_TERM_CAPACITY)
+
+    objects = CourseTermManager()

@@ -3,10 +3,10 @@ from django.core import validators as core_validators
 from django.db import models
 from django.db.models import Q
 
-import variable_names as vn_edu_enroll
+from EduEnroll import variable_names as vn_edu_enroll
 
 
-class EnrollmentManager(models.manager):
+class EnrollmentManager(models.Manager):
     pass
 
 
@@ -24,14 +24,14 @@ class Enrollment(models.Model):
                                           limit_choices_to=Q(is_teacher=True),
                                           verbose_name=vn_edu_enroll.ENROLLMENT_TEACHER_ASISTANT,
                                           related_name='enrollment_teacher_assistants')
-    status = models.CharField(choices=StatusChoices.choices, verbose_name=vn_edu_enroll.ENROLLMENT_STATUS, default=1)
+    status = models.IntegerField(choices=StatusChoices.choices, verbose_name=vn_edu_enroll.ENROLLMENT_STATUS, default=1)
     teacher_assistant_description = models.TextField(verbose_name=vn_edu_enroll.ENROLLMENT_TEACHER_ASISTANT_DESCRIPTION)
     taken_term_number = models.IntegerField(verbose_name=vn_edu_enroll.ENROLLMENT_TAKEN_TERM_NUMBER)
 
     objects = EnrollmentManager()
 
 
-class StudentCourseManager(models.manager):
+class StudentCourseManager(models.Manager):
     pass
 
 
@@ -46,7 +46,7 @@ class StudentCourse(models.Model):
                                     related_name='student_courses')
     student = models.ForeignKey(get_user_model(), on_delete=models.PROTECT,
                                 verbose_name=vn_edu_enroll.STUDENT_COURSE_STUDENT, related_name='student_courses')
-    status = models.CharField(choices=StatusChoices.choices, verbose_name=vn_edu_enroll.STUDENT_COURSE_STATUS)
+    status = models.IntegerField(choices=StatusChoices.choices, verbose_name=vn_edu_enroll.STUDENT_COURSE_STATUS)
     score = models.FloatField(verbose_name=vn_edu_enroll.STUDENT_COURSE_SCORE,
                               validators=[core_validators.MaxValueValidator(100), core_validators.MinValueValidator(0)])
 
