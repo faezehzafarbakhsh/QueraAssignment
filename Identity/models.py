@@ -1,7 +1,7 @@
 import uuid
 
 from django.contrib.auth import models as user_models
-from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.models import UserManager
 
 from django.db import models
 from django.db.models import Q
@@ -23,7 +23,7 @@ def user_portrait_dir_path(instance, file_name):
     )
 
 
-class UserManager(BaseUserManager):
+class UserManager(UserManager):
     pass
 
 
@@ -46,7 +46,7 @@ class User(user_models.AbstractUser):
     mobile = models.CharField(max_length=11, null=True, blank=True, verbose_name=vn_identity.USER_MOBILE)
     national_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=vn_identity.USER_NATIONAL_CODE)
     gender = models.IntegerField(choices=GenderChoices.choices, verbose_name=vn_identity.USER_GENDER, default=0)
-    birth_date = jmodels.jDateField(verbose_name=vn_identity.USER_BIRTH_DATE)
+    birth_date = jmodels.jDateField(verbose_name=vn_identity.USER_BIRTH_DATE, null=True)
     college = models.ForeignKey('EduBase.College', on_delete=models.PROTECT, null=True, blank=True,
                                 verbose_name=vn_identity.USER_COLLEGE, related_name="users")
     edu_field = models.ForeignKey('EduBase.EduField', on_delete=models.PROTECT, null=True, blank=True,
