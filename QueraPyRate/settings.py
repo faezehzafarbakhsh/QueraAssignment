@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv, find_dotenv
 
-load_dotenv(find_dotenv(filename="env.main"))
+load_dotenv(find_dotenv(filename=".env.main"))
 IS_PRODUCTION = int(os.environ.get("IS_PRODUCTION"))
 
 if IS_PRODUCTION:
@@ -47,7 +47,9 @@ DJANGO_APPS = [
 ]
 
 OTHER_APPS = [
-    "rest_framework"
+    "rest_framework",
+    'rest_framework_simplejwt',
+
 ]
 
 PROJECT_APPS = [
@@ -154,9 +156,10 @@ AUTH_USER_MODEL = 'Identity.User'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
 }
