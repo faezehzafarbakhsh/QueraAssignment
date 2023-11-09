@@ -3,7 +3,9 @@ import uuid
 from django.contrib.auth import models as user_models
 
 from django.db import models
-import variable_names as vn_identity
+from django.db.models import Q
+
+from Identity import variable_names as vn_identity
 from django_jalali.db import models as jmodels
 from django.contrib.auth import get_user_model
 
@@ -43,7 +45,7 @@ class User(user_models.AbstractUser):
     gender = models.IntegerField(choices=GenderChoices.choices, verbose_name=vn_identity.USER_GENDER)
     birth_date = jmodels.jDateField(verbose_name=vn_identity.USER_BIRTH_DATE)
     # college = models.ForeignKey('EduBase.College', on_delete=models.PROTECT, null=True, blank=True,
-    #                             verbose_name=vn_identity.USER_COLLEGE)
+    #                             verbose_name=vn_identity.USER_COLLEGE, related_name="users")
     # edu_field = models.ForeignKey('EduBase.EduField', on_delete=models.PROTECT, null=True, blank=True,
     #                               verbose_name=vn_identity.USER_EDU_FIELD, related_name="users")
     is_it_manager = models.BooleanField(default=False, verbose_name=vn_identity.USER_IS_IT_MANAGER)
@@ -68,8 +70,8 @@ class Student(models.Model):
         YES = 1, vn_identity.YES
         NO = 2, vn_identity.NO
 
-    user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT,
-                             verbose_name=vn_identity.STUDENT_USER, related_name="students")
+    user = models.OneToOneField(get_user_model(), on_delete=models.PROTECT, verbose_name=vn_identity.STUDENT_USER,
+                                related_name="students", limit_choices_to=Q(is_student=True))
     entry_year = jmodels.jDateField(verbose_name=vn_identity.STUDENT_ENTRY_YEAR)
     entry_term = models.IntegerField(
         choices=EntryChoices.choices, verbose_name=vn_identity.STUDENT_ENTRY_TERM)
@@ -86,8 +88,8 @@ class TeacherManager(models.Manager):
 
 
 class Teacher(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT, verbose_name=vn_identity.TEACHER_USER,
-                             related_name="teachers")
+    user = models.OneToOneField(get_user_model(), on_delete=models.PROTECT, verbose_name=vn_identity.TEACHER_USER,
+                                related_name="teachers", limit_choices_to=Q(is_teacher=True))
     level = models.CharField(verbose_name=vn_identity.TEACHER_LEVEL, max_length=64)
     expert = models.CharField(verbose_name=vn_identity.TEACHER_EXPERT, max_length=64)
 

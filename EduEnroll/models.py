@@ -3,10 +3,10 @@ from django.core import validators as core_validators
 from django.db import models
 from django.db.models import Q
 
-import variable_names as vn_edu_enroll
+from EduEnroll import variable_names as vn_edu_enroll
 
 
-class EnrollmentManager(models.manager):
+class EnrollmentManager(models.Manager):
     pass
 
 
@@ -31,7 +31,7 @@ class Enrollment(models.Model):
     objects = EnrollmentManager()
 
 
-class StudentCourseManager(models.manager):
+class StudentCourseManager(models.Manager):
     pass
 
 
