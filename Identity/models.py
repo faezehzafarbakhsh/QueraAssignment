@@ -1,6 +1,7 @@
 import uuid
 
 from django.contrib.auth import models as user_models
+from django.contrib.auth.models import UserManager
 
 from django.db import models
 from django.db.models import Q
@@ -22,16 +23,18 @@ def user_portrait_dir_path(instance, file_name):
     )
 
 
-class UserManager(models.Manager):
+class UserManager(UserManager):
     pass
 
 
 class User(user_models.AbstractUser):
     class GenderChoices(models.IntegerChoices):
+        DEFAULT = 0 , vn_identity.DEFAULT
         MALE = 1, vn_identity.MALE
         FEMALE = 2, vn_identity.FEMALE
 
     class MilitaryChoices(models.IntegerChoices):
+        DEFAULT = 0 , vn_identity.DEFAULT
         END_OF_SERVICE_CARD = 1, vn_identity.END_OF_SERVICE_CARD
         MEDICAL_EXEMPTION = 2, vn_identity.MEDICAL_EXEMPTION
         NON_MEDICAL_EXEMPTION = 3, vn_identity.NON_MEDICAL_EXEMPTION
@@ -42,18 +45,18 @@ class User(user_models.AbstractUser):
                                  verbose_name=vn_identity.USER_PORTRAIT)
     mobile = models.CharField(max_length=11, null=True, blank=True, verbose_name=vn_identity.USER_MOBILE)
     national_code = models.CharField(max_length=10, null=True, blank=True, verbose_name=vn_identity.USER_NATIONAL_CODE)
-    gender = models.IntegerField(choices=GenderChoices.choices, verbose_name=vn_identity.USER_GENDER)
-    birth_date = jmodels.jDateField(verbose_name=vn_identity.USER_BIRTH_DATE)
-    # college = models.ForeignKey('EduBase.College', on_delete=models.PROTECT, null=True, blank=True,
-    #                             verbose_name=vn_identity.USER_COLLEGE, related_name="users")
-    # edu_field = models.ForeignKey('EduBase.EduField', on_delete=models.PROTECT, null=True, blank=True,
-    #                               verbose_name=vn_identity.USER_EDU_FIELD, related_name="users")
+    gender = models.IntegerField(choices=GenderChoices.choices, verbose_name=vn_identity.USER_GENDER, default=0)
+    birth_date = jmodels.jDateField(verbose_name=vn_identity.USER_BIRTH_DATE, null=True)
+    college = models.ForeignKey('EduBase.College', on_delete=models.PROTECT, null=True, blank=True,
+                                verbose_name=vn_identity.USER_COLLEGE, related_name="users")
+    edu_field = models.ForeignKey('EduBase.EduField', on_delete=models.PROTECT, null=True, blank=True,
+                                  verbose_name=vn_identity.USER_EDU_FIELD, related_name="users")
     is_it_manager = models.BooleanField(default=False, verbose_name=vn_identity.USER_IS_IT_MANAGER)
     is_chancellor = models.BooleanField(default=False, verbose_name=vn_identity.USER_IS_CHANCELLOR)
     is_student = models.BooleanField(default=False, verbose_name=vn_identity.USER_IS_STUDENT)
     is_teacher = models.BooleanField(default=False, verbose_name=vn_identity.USER_IS_TEACHER)
     military_service = models.IntegerField(choices=MilitaryChoices.choices, null=True, blank=True,
-                                           verbose_name=vn_identity.USER_MILITARY_SERVICE)
+                                           verbose_name=vn_identity.USER_MILITARY_SERVICE, default=0)
     objects = UserManager()
 
 
