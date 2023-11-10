@@ -1,7 +1,7 @@
 from rest_framework import generics
-from .serializers import  UserSerializer 
+from .serializers import UserSerializer
 from rest_framework.permissions import AllowAny
-from .models import Teacher , User
+from .models import Teacher, User
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 # Create your views here.
@@ -22,6 +22,7 @@ class UserView(generics.ListCreateAPIView):
             "message": "User registered successfully."
         }, status=status.HTTP_201_CREATED)
 
+
 class UserAuthenticationView:
     pass
 
@@ -39,11 +40,11 @@ class TeacherListCreateApiView(generics.ListCreateAPIView):
 #     queryset = Teacher.objects.all()
 
 #     def create(self, request):
-        
+
 #         serializer = self.get_serializer(data=request.data)
 #         serializer.is_valid(raise_exception=True)
 #         serializer.save()
-        
+
 #         return Response(serializer.data)
 
 
