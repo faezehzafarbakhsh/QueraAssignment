@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import TeacherListOrCreateView
+from Identity import views as identity_views
 
 urlpatterns = [
-    path('admin/professors/', TeacherListOrCreateView.as_view(), name='teacher-list-create'),
+    path('auth/register/', identity_views.UserRegisterIView.as_view()),
 ]
