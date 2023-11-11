@@ -5,6 +5,10 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import validate_email
 from django.utils.translation import gettext as _
 from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import AccessToken
+
+
 
 User = get_user_model()
 
@@ -55,3 +59,27 @@ class RegisterSerializer(serializers.Serializer):
         )
 
         return user
+
+
+class UserTokenLoginSerializer(serializers.Serializer):
+    token = serializers.CharField()
+
+    def validate(self, data):
+        token = data.get('token')
+
+        if not token:
+            raise serializers.ValidationError('توکن را وارد کنید.')
+
+        try:
+            user_id = AccessToken(token).payload.get('user_id')
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('کاربر یافت نشد.')
+        except Exception as e:
+            raise serializers.ValidationError(str(e))
+
+        user = authenticate(request=self.context.get('request'), user=user)
+
+
+        data['user'] = user
+        return data

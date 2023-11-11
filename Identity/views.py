@@ -29,7 +29,21 @@ class UserRegisterIView(generics.CreateAPIView):
 
         # Return response with token
         return Response({
-            "message": "User registered successfully",
             "refresh": str(refresh),
             "access": str(refresh.access_token),
         }, status=status.HTTP_201_CREATED)
+
+
+class UserTokenLoginView(generics.CreateAPIView):
+    serializer_class = identity_serializers.UserTokenLoginSerializer
+    queryset = User.objects.all()
+    http_method_names = ['post']
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.validated_data['user']
+
+        return Response({'message':"کاربر با موفقیت وارد سایت شد."} , status=status.HTTP_200_OK)
