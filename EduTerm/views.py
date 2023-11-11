@@ -9,6 +9,6 @@ from EduTerm import models as edu_term_models
 class TermListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_term_serializers.TermSerializer
     queryset =edu_term_models.Term.objects.all()
-    http_method_names = [ 'GET', ]
+    http_method_names = [ 'get','post', ]
     permission_classes = (AllowAny,)
     
