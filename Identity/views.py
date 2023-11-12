@@ -13,6 +13,8 @@ from Identity import serializers as identity_serializers
 
 User = get_user_model()
 
+# Authentication Views
+
 
 class UserRegisterIView(generics.CreateAPIView):
     """
@@ -88,7 +90,7 @@ class UserLogoutView(APIView):
     Returns:
         Response: JSON response with a success message upon successful user logout.
     """
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
         """
@@ -205,3 +207,6 @@ class ChangePasswordActionView(generics.CreateAPIView):
             {'message': 'رمز عبور با موفقیت تغییر یافت.'},
             status=status.HTTP_200_OK
         )
+
+# It Manger Views
+

@@ -12,6 +12,8 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 
 User = get_user_model()
 
+# Authentication Serializers
+
 
 class RegisterSerializer(serializers.Serializer):
     """
@@ -315,3 +317,6 @@ class ChangePasswordActionSerializer(serializers.Serializer):
         cache.delete(cache_key)
 
         return user
+
+# It Manager Serializers
+
