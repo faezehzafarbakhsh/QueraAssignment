@@ -1,10 +1,11 @@
 from rest_framework import serializers
 
 from django.core.cache import cache
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from django.core.validators import validate_email
+from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -142,7 +143,7 @@ class UserTokenLoginSerializer(serializers.Serializer):
         token (str): The JWT token for user authentication.
 
     Methods:
-        validate: Validates the presence of the token and authenticates the user.
+        validate: Validates the presence of the token, authenticates the user, and logs them in.
 
     Raises:
         serializers.ValidationError: If the token is missing, the user is not found, or an exception occurs during authentication.
@@ -151,7 +152,7 @@ class UserTokenLoginSerializer(serializers.Serializer):
 
     def validate(self, data):
         """
-        Validates the presence of the token and authenticates the user.
+        Validates the presence of the token, authenticates the user, and logs them in.
 
         Args:
             data (dict): The input data containing the token.
@@ -175,15 +176,42 @@ class UserTokenLoginSerializer(serializers.Serializer):
         except Exception as e:
             raise serializers.ValidationError(str(e))
 
-        user = authenticate(request=self.context.get('request'), user=user)
+        # Manually check if the user is active and log them in
+        if user.is_active:
+            login(self.context.get('request'), user)
+
         data['user'] = user
         return data
 
 
 class ChangePasswordRequestSerializer(serializers.Serializer):
+    """
+    Serializer for requesting a change of password.
+
+    Attributes:
+        username (str): The username for which the password change is requested.
+
+    Methods:
+        validate_username: Validates the existence of the user with the provided username.
+
+    Raises:
+        serializers.ValidationError: If the user is not found.
+    """
     username = serializers.CharField()
 
     def validate_username(self, value):
+        """
+        Validates the existence of the user with the provided username.
+
+        Args:
+            value (str): The username to be validated.
+
+        Returns:
+            str: The validated username.
+
+        Raises:
+            serializers.ValidationError: If the user is not found.
+        """
         try:
             user = User.objects.get(username=value)
         except User.DoesNotExist:
@@ -192,7 +220,23 @@ class ChangePasswordRequestSerializer(serializers.Serializer):
 
 
 class ChangePasswordActionSerializer(serializers.Serializer):
-    code = serializers.CharField()
+    """
+    Serializer for changing the user password.
+
+    Attributes:
+        token (str): The token used for password change verification.
+        new_password (str): The new password to be set.
+        confirm_password (str): Confirmation of the new password.
+
+    Methods:
+        validate_password1: Validates the password according to Django password validation.
+        validate: Validates the token and ensures the new password and confirmation match.
+        create: Changes the user's password.
+
+    Raises:
+        serializers.ValidationError: If the token is invalid, passwords do not match, or password validation fails.
+    """
+    token = serializers.CharField()
     new_password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
 
@@ -201,7 +245,7 @@ class ChangePasswordActionSerializer(serializers.Serializer):
         Validates the password according to Django password validation.
 
         Args:
-            password1 (str): The password to be validated.
+            new_password (str): The password to be validated.
 
         Returns:
             str: The validated password.
@@ -217,17 +261,28 @@ class ChangePasswordActionSerializer(serializers.Serializer):
         return new_password
 
     def validate(self, data):
-        code = data.get('code')
+        """
+        Validates the token and ensures the new password and confirmation match.
+
+        Args:
+            data (dict): The input data containing the token and passwords.
+
+        Returns:
+            dict: The validated data.
+
+        Raises:
+            serializers.ValidationError: If the token is invalid or passwords do not match.
+        """
+        user = self.context['user']
+        token = data.get('token')
         new_password = data.get('new_password')
         confirm_password = data.get('confirm_password')
 
-        # Check if the code is valid
-        # Access the user_id from the view's kwargs
-        user_id = self.context['view'].kwargs.get('pk')
-        cache_key = f"change_password_code_{user_id}"
-        stored_code = cache.get(cache_key)
+        # Check if the token is valid
+        cache_key = f"change_password_token_{user.id}"
+        stored_token = cache.get(cache_key)
 
-        if stored_code is None or stored_code != code:
+        if str(stored_token) != str(token):
             raise serializers.ValidationError("کد نامعتبر است.")
 
         # Validate new password and confirmation
@@ -240,15 +295,23 @@ class ChangePasswordActionSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
-        user_id = self.context['view'].kwargs.get('pk')
-        user = User.objects.get(id=user_id)
+        """
+        Changes the user's password.
+
+        Args:
+            validated_data (dict): The validated data containing the new password.
+
+        Returns:
+            User: The user object with the updated password.
+        """
+        user = self.context['user']
 
         # Reset the password for the user
-        user.password = set_password(validated_data['new_password'])
+        user.password = make_password(validated_data['new_password'])
         user.save()
 
-        # Optionally, you can invalidate the code after it's used
-        cache_key = f"change_password_code_{user_id}"
+        # Optionally, you can invalidate the token after it's used
+        cache_key = f"change_password_token_{user.id}"
         cache.delete(cache_key)
 
         return user
