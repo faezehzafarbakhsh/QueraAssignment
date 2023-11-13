@@ -24,8 +24,10 @@ def user_portrait_dir_path(instance, file_name):
 
 
 class UserManager(UserManager):
-    pass
-
+    
+    def get_student_by_id(self, id):
+        query = self.get(id=id, is_student=True)
+        return query
 
 class User(user_models.AbstractUser):
     class GenderChoices(models.IntegerChoices):
