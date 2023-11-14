@@ -34,3 +34,9 @@ class CacheManager():
         except Exception as e:
             print(f"Error deleting cache token: {e}")
             return None
+
+
+class GlobalFunction:
+    @staticmethod
+    def make_random_password():
+        return "1234"

@@ -307,6 +307,7 @@ class ItTeacherListCreateView(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
 
 
+
 class ItTeacherRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = identity_serializers.ItTeacherListCreateSerializer
     queryset = User.objects.all()

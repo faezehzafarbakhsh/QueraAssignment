@@ -13,6 +13,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 
 from Identity import models as identity_models
 from Identity import variable_names as vn_identity
+from Identity import custom_classes
 
 User = get_user_model()
 
@@ -308,13 +309,8 @@ class ItTeacherListCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = identity_models.User
-        fields = ['username', 'password', 'email', 'gender',
+        fields = ['username', 'email', 'gender',
                   'mobile', 'national_code', 'expert', 'level']
-
-        extra_kwargs = {
-            # Exclude password during updates
-            'password': {'read_only': True},
-        }
 
     def create(self, validated_data):
         teachers_data = validated_data.pop('teachers', {})
@@ -323,6 +319,10 @@ class ItTeacherListCreateSerializer(serializers.ModelSerializer):
 
         validated_data['is_teacher'] = True
 
+        validated_data['password'] = custom_classes.GlobalFunction.make_random_password()
+
+        # send password as a email to user
+        
         user_instance = User.objects.create_user(**validated_data)
 
         identity_models.Teacher.objects.create(
