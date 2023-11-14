@@ -88,37 +88,37 @@ class UserTokenLoginSerializer(serializers.Serializer):
         return data
 
 
-class ChangePasswordRequestSerializer(serializers.ModelSerializer):
+class ChangePasswordRequestSerializer(serializers.Serializer):
     """
     Serializer for requesting a change of password.
 
     Attributes:
         username (str): The username for which the password change is requested.
 
-    Methods:
-        validate_username: Validates the existence of the user with the provided username.
-
     Raises:
         serializers.ValidationError: If the user is not found.
     """
-    class Meta:
-        model = User
-        fields = ["username",]
+    username = serializers.CharField(
+        max_length=20,
+        label="نام کاربری",
+    )
 
-    def validate_username(self, value):
+    def validate(self, data):
         """
         Validates the existence of the user with the provided username.
 
         Args:
-            value (str): The username to be validated.
+            data (dict): The input data containing the username.
 
         Returns:
-            str: The validated username.
+            dict: The validated data.
 
         Raises:
             serializers.ValidationError: If the user is not found.
         """
-        user = get_object_or_404(User, username=value)
+        username = data.get('username')
+        user = get_object_or_404(User, username=username)
+        return data
 
 
 class ChangePasswordActionSerializer(serializers.Serializer):
@@ -175,24 +175,18 @@ class ChangePasswordActionSerializer(serializers.Serializer):
         Raises:
             serializers.ValidationError: If the token is invalid or passwords do not match.
         """
-        user = self.context['user']
-        token = data.get('token')
+        stored_token_for_user = self.context['stored_token_for_user']
+
+        user_input_token = data.get('token')
         new_password = data.get('new_password')
         confirm_password = data.get('confirm_password')
 
-        # Check if the token is valid
-        cache_key = f"change_password_token_{user.id}"
-        stored_token = cache.get(cache_key)
-
-        if str(stored_token) != str(token):
-            raise serializers.ValidationError("کد نامعتبر است.")
+        if str(stored_token_for_user) != str(user_input_token):
+            raise serializers.ValidationError("توکن نامعتبر است.")
 
         # Validate new password and confirmation
         if new_password != confirm_password:
             raise serializers.ValidationError("رمز ها مطابقت ندارند.")
-
-        # Additional custom password validation if needed
-        # For example, you might want to enforce a certain complexity
 
         return data
 
@@ -231,6 +225,11 @@ class ItTeacherListCreateSerializer(serializers.ModelSerializer):
         model = identity_models.User
         fields = ['username', 'password', 'email', 'gender',
                   'mobile', 'national_code', 'expert', 'level']
+        
+        extra_kwargs = {
+            # Exclude password during updates
+            'password': {'read_only': True},
+        }
 
     def create(self, validated_data):
         teachers_data = validated_data.pop('teachers', {})
@@ -248,3 +247,34 @@ class ItTeacherListCreateSerializer(serializers.ModelSerializer):
         )
 
         return user_instance
+
+    def update(self, instance, validated_data):
+        teachers_data = validated_data.pop('teachers', {})
+        expert = teachers_data.get('expert')
+        level = teachers_data.get('level')
+
+        # # Update User fields
+        # instance.username = validated_data.get('username', instance.username)
+        # instance.password = validated_data.get('password', instance.password)
+        # instance.email = validated_data.get('email', instance.email)
+        # instance.gender = validated_data.get('gender', instance.gender)
+        # instance.mobile = validated_data.get('mobile', instance.mobile)
+        # instance.national_code = validated_data.get(
+        #     'national_code', instance.national_code)
+
+        # Update Teacher fields
+        # instance.teachers.expert = expert
+        # instance.teachers.level = level
+        
+        # Update User fields
+        for field in self.fields.keys():
+            if field in validated_data:
+                setattr(instance, field, validated_data[field])
+
+        # Update Teacher fields
+        for field in ['expert', 'level']:
+            setattr(instance.teachers, field, locals()[field])
+
+        instance.save()
+
+        return instance

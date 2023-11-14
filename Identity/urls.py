@@ -14,6 +14,7 @@ urlpatterns = [
 
      # Users crud
      path('admin/professors/', identity_views.ItTeacherListCreateView.as_view()),
+     path('admin/professors/<int:pk>/', identity_views.ItTeacherRetrieveUpdateDestroyView.as_view()),
 
 
 
