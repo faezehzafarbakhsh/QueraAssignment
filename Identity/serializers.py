@@ -10,6 +10,8 @@ from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 
+from Identity import models as identity_models
+
 User = get_user_model()
 
 # Authentication Serializers
@@ -313,10 +315,11 @@ class ChangePasswordActionSerializer(serializers.Serializer):
         user.save()
 
         # Optionally, you can invalidate the token after it's used
-        cache_key = f"change_password_token_{user.id}"
-        cache.delete(cache_key)
+        # cache_key = f"change_password_token_{user.id}"
+        # cache.delete(cache_key)
 
         return user
 
 # It Manager Serializers
-
+class ItTeacherListCreateSerializer(serializers.ModelSerializer):
+    pass

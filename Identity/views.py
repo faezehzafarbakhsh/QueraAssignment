@@ -10,6 +10,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from Identity import models as identity_models
 from Identity import serializers as identity_serializers
+from Identity import permisson_classes as custom_permissons
 
 User = get_user_model()
 
@@ -44,7 +45,7 @@ class UserRegisterIView(generics.CreateAPIView):
         access, user = serializer.save()
 
         return Response({
-            "token": access,
+            "token": access, 
         }, status=status.HTTP_201_CREATED)
 
 
@@ -148,9 +149,9 @@ class ChangePasswordRequestView(generics.CreateAPIView):
         user = User.objects.get(username=username)
 
         # Generate and store the one-time code in cache
-        token = AccessToken.for_user(user)
-        cache_key = f"change_password_token_{user.id}"
-        cache.set(cache_key, token, timeout=3 * 60)
+        # token = AccessToken.for_user(user)
+        # cache_key = f"change_password_token_{user.id}"
+        # cache.set(cache_key, token, timeout=3 * 60)
 
         # You can send the code through an email or any other means here
 
@@ -210,3 +211,6 @@ class ChangePasswordActionView(generics.CreateAPIView):
 
 # It Manger Views
 
+
+class ItTeacherListCreateView(generics.ListCreateAPIView):
+    serializer_class = identity_serializers.ItTeacherListCreateSerializer
