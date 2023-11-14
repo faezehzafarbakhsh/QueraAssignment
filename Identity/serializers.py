@@ -11,6 +11,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from Identity import models as identity_models
+from Identity import variable_names as vn_identity
 
 User = get_user_model()
 
@@ -308,7 +309,7 @@ class ChangePasswordActionSerializer(serializers.Serializer):
         Returns:
             User: The user object with the updated password.
         """
-        user = self.context['user']
+        user = self.context['request'].user
 
         # Reset the password for the user
         user.password = make_password(validated_data['new_password'])
@@ -321,5 +322,32 @@ class ChangePasswordActionSerializer(serializers.Serializer):
         return user
 
 # It Manager Serializers
+
+
 class ItTeacherListCreateSerializer(serializers.ModelSerializer):
-    pass
+    expert = serializers.CharField(
+        source='teachers.expert', label=vn_identity.TEACHER_EXPERT, max_length=64, )
+    level = serializers.CharField(
+        source='teachers.level', label=vn_identity.TEACHER_LEVEL, max_length=64, )
+
+    class Meta:
+        model = identity_models.User
+        fields = ['username', 'password', 'email', 'gender',
+                  'mobile', 'national_code', 'expert', 'level']
+
+    def create(self, validated_data):
+        teachers_data = validated_data.pop('teachers', {})
+        expert = teachers_data.get('expert')
+        level = teachers_data.get('level')
+
+        validated_data['is_teacher'] = True
+
+        user_instance = User.objects.create_user(**validated_data)
+
+        identity_models.Teacher.objects.create(
+            user=user_instance,
+            expert=expert,
+            level=level
+        )
+
+        return user_instance

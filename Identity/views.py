@@ -1,7 +1,6 @@
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from django.core.cache import cache
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
@@ -10,7 +9,8 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from Identity import models as identity_models
 from Identity import serializers as identity_serializers
-from Identity import permisson_classes as custom_permissons
+from Identity import permisson_classes as custom_permissions
+from Identity import custom_classes
 
 User = get_user_model()
 
@@ -45,7 +45,7 @@ class UserRegisterIView(generics.CreateAPIView):
         access, user = serializer.save()
 
         return Response({
-            "token": access, 
+            "token": access,
         }, status=status.HTTP_201_CREATED)
 
 
@@ -64,20 +64,18 @@ class UserTokenLoginView(generics.CreateAPIView):
     http_method_names = ['post']
     permission_classes = (AllowAny,)
 
-    def post(self, request, *args, **kwargs):
-        """
-        Custom method to handle user login.
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        print(context)
+        return context
 
-        Args:
-            request (Request): The HTTP request object.
-
-        Returns:
-            Response: JSON response with a success message.
-        """
-        serializer = self.get_serializer(data=request.data, context={
-                                         'view': self, 'request': request})
+    def perform_create(self, serializer):
+        context = self.get_serializer_context()
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
+        return super().perform_create(serializer)
+
+    def post(self, request, *args, **kwargs):
         return Response({"message": "کاربر با موفقیت وارد سایت شد."}, status=status.HTTP_200_OK)
 
 
@@ -103,7 +101,7 @@ class UserLogoutView(APIView):
         Returns:
             Response: JSON response with a success message.
         """
-        return Response({'detail': 'Successfully logged out.'}, status=status.HTTP_200_OK)
+        return Response({'message': 'یوزر با موفقیت از سایت خارج شد..'}, status=status.HTTP_200_OK)
 
 
 class ChangePasswordRequestView(generics.CreateAPIView):
@@ -127,7 +125,22 @@ class ChangePasswordRequestView(generics.CreateAPIView):
     http_method_names = ['post', 'get']
     permission_classes = (AllowAny,)
 
-    def create(self, request, *args, **kwargs):
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        return context
+
+    def perform_create(self, serializer):
+        context = self.get_serializer_context()
+        serializer.is_valid(raise_exception=True)
+        username = serializer.validated_data['username']
+        user = User.objects.get(username=username)
+
+        cashed_token = custom_classes.CacheManager().set_cache_token(user)
+        print(str(cashed_token))
+
+        return super().perform_create(serializer)
+
+    def post(self, request, *args, **kwargs):
         """
         Creates a one-time token for password change, stores it in cache, and sends it to the user.
 
@@ -142,22 +155,10 @@ class ChangePasswordRequestView(generics.CreateAPIView):
         Raises:
             None
         """
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        username = serializer.validated_data['username']
-        user = User.objects.get(username=username)
-
-        # Generate and store the one-time code in cache
-        # token = AccessToken.for_user(user)
-        # cache_key = f"change_password_token_{user.id}"
-        # cache.set(cache_key, token, timeout=3 * 60)
-
-        # You can send the code through an email or any other means here
-
+        cached_token = getattr(self.serializer_class, 'cached_token', None)
         return Response(
             {'message': 'توکن یکبار مصرف برای تغییر رمز ارسال شد.',
-             'change_password_token': str(token)},
+             'change_password_token': str(cached_token)},
             status=status.HTTP_200_OK
         )
 
@@ -183,7 +184,11 @@ class ChangePasswordActionView(generics.CreateAPIView):
     http_method_names = ['post', 'get']
     permission_classes = (AllowAny,)
 
-    def create(self, request, *args, **kwargs):
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        return context
+
+    def perform_create(self, request, *args, **kwargs):
         """
         Changes the user's password based on the provided token.
 
@@ -198,8 +203,7 @@ class ChangePasswordActionView(generics.CreateAPIView):
         Raises:
             None
         """
-        serializer = self.get_serializer(
-            data=request.data, context={'view': self, 'user': request.user})
+        serializer = self.get_serializer_context()
         serializer.is_valid(raise_exception=True)
 
         user = serializer.save()
@@ -214,3 +218,6 @@ class ChangePasswordActionView(generics.CreateAPIView):
 
 class ItTeacherListCreateView(generics.ListCreateAPIView):
     serializer_class = identity_serializers.ItTeacherListCreateSerializer
+    queryset = User.objects.all()
+    http_method_names = ['post', 'get']
+    permission_classes = (IsAuthenticated,custom_permissions.IsItManager)

@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission
 
+
 class IsItManager(BasePermission):
     """
     Custom permission to check if the user is an IT manager.
