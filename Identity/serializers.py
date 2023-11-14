@@ -172,6 +172,36 @@ class UserTokenLoginSerializer(serializers.Serializer):
         return data
 
 
+class ChangePasswordRequestSerializer(serializers.Serializer):
+    """
+    Serializer for requesting a change of password.
+
+    Attributes:
+        username (str): The username for which the password change is requested.
+
+    Raises:
+        serializers.ValidationError: If the user is not found.
+    """
+    username = serializers.CharField(max_length=20, label="نام کاربری")
+
+    def validate(self, data):
+        """
+        Validates the existence of the user with the provided username.
+
+        Args:
+            data (dict): The input data containing the username.
+
+        Returns:
+            dict: The validated data.
+
+        Raises:
+            serializers.ValidationError: If the user is not found.
+        """
+        username = data.get('username')
+        user = get_object_or_404(User, username=username)
+        return data
+
+
 class ChangePasswordActionSerializer(serializers.Serializer):
     """
     Serializer for changing the user's password.
@@ -196,8 +226,10 @@ class ChangePasswordActionSerializer(serializers.Serializer):
 
     """
     token = serializers.CharField()
-    new_password = serializers.CharField(write_only=True)
-    confirm_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(
+        write_only=True, style={'input_type': 'password'})
+    confirm_password = serializers.CharField(
+        write_only=True, style={'input_type': 'password'})
 
     def validate_password1(self, new_password):
         """
