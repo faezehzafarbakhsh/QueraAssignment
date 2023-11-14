@@ -20,6 +20,18 @@ User = get_user_model()
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    """
+    Serializer for user registration.
+
+    Attributes:
+        password2 (str): The confirmation of the user's password.
+
+    Methods:
+        create: Creates a new user instance with the provided data.
+
+    Raises:
+        serializers.ValidationError: If the passwords do not match.
+    """
     password2 = serializers.CharField(
         write_only=True, label="تایید گذر واژه", style={'input_type': 'password'})
 
@@ -32,6 +44,18 @@ class RegisterSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
+        """
+        Creates a new user instance with the provided data.
+
+        Args:
+            validated_data (dict): The validated data containing user information.
+
+        Returns:
+            User: The newly created user instance.
+
+        Raises:
+            serializers.ValidationError: If the passwords do not match.
+        """
         password = validated_data.pop('password2')
         user = User(**validated_data)
         user.set_password(password)
@@ -51,6 +75,11 @@ class UserTokenLoginSerializer(serializers.Serializer):
 
     Raises:
         serializers.ValidationError: If the token is missing, the user is not found, or an exception occurs during authentication.
+
+    Notes:
+        This serializer is designed to handle user login using a JWT token. It validates the presence of the token,
+        authenticates the user, and logs them in if they are active. If any issues occur during this process,
+        a `serializers.ValidationError` is raised with relevant error messages.
     """
     token = serializers.CharField()
 
@@ -88,42 +117,64 @@ class UserTokenLoginSerializer(serializers.Serializer):
         return data
 
 
-class ChangePasswordRequestSerializer(serializers.Serializer):
+class UserTokenLoginSerializer(serializers.Serializer):
     """
-    Serializer for requesting a change of password.
+    Serializer for user login using a JWT token.
 
     Attributes:
-        username (str): The username for which the password change is requested.
+        token (str): The JWT token for user authentication.
+
+    Methods:
+        validate: Validates the presence of the token, authenticates the user, and logs them in.
 
     Raises:
-        serializers.ValidationError: If the user is not found.
+        serializers.ValidationError: If the token is missing, the user is not found, or an exception occurs during authentication.
+
+    Notes:
+        This serializer is designed to handle user login using a JWT token. It validates the presence of the token,
+        authenticates the user, and logs them in if they are active. If any issues occur during this process,
+        a `serializers.ValidationError` is raised with relevant error messages.
+
     """
-    username = serializers.CharField(
-        max_length=20,
-        label="نام کاربری",
-    )
+    token = serializers.CharField()
 
     def validate(self, data):
         """
-        Validates the existence of the user with the provided username.
+        Validates the presence of the token, authenticates the user, and logs them in.
 
         Args:
-            data (dict): The input data containing the username.
+            data (dict): The input data containing the token.
 
         Returns:
-            dict: The validated data.
+            dict: The validated data containing the authenticated user.
 
         Raises:
-            serializers.ValidationError: If the user is not found.
+            serializers.ValidationError: If the token is missing, the user is not found, or an exception occurs during authentication.
         """
-        username = data.get('username')
-        user = get_object_or_404(User, username=username)
+        token = data.get('token')
+
+        if not token:
+            raise serializers.ValidationError('توکن را وارد کنید.')
+
+        try:
+            user_id = AccessToken(token).payload.get('user_id')
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('کاربر یافت نشد.')
+        except Exception as e:
+            raise serializers.ValidationError(str(e))
+
+        # Manually check if the user is active and log them in
+        if user.is_active:
+            login(self.context.get('request'), user)
+
+        data['user'] = user
         return data
 
 
 class ChangePasswordActionSerializer(serializers.Serializer):
     """
-    Serializer for changing the user password.
+    Serializer for changing the user's password.
 
     Attributes:
         token (str): The token used for password change verification.
@@ -137,6 +188,12 @@ class ChangePasswordActionSerializer(serializers.Serializer):
 
     Raises:
         serializers.ValidationError: If the token is invalid, passwords do not match, or password validation fails.
+
+    Notes:
+        This serializer is designed for changing the user's password. It includes methods to validate the new password
+        according to Django password validation, verify the token for password change, and ensure that the new password
+        and confirmation match. The `create` method is responsible for updating the user's password in the database.
+
     """
     token = serializers.CharField()
     new_password = serializers.CharField(write_only=True)
@@ -206,10 +263,6 @@ class ChangePasswordActionSerializer(serializers.Serializer):
         user.password = make_password(validated_data['new_password'])
         user.save()
 
-        # Optionally, you can invalidate the token after it's used
-        # cache_key = f"change_password_token_{user.id}"
-        # cache.delete(cache_key)
-
         return user
 
 # It Manager Serializers
@@ -225,7 +278,7 @@ class ItTeacherListCreateSerializer(serializers.ModelSerializer):
         model = identity_models.User
         fields = ['username', 'password', 'email', 'gender',
                   'mobile', 'national_code', 'expert', 'level']
-        
+
         extra_kwargs = {
             # Exclude password during updates
             'password': {'read_only': True},
@@ -265,7 +318,7 @@ class ItTeacherListCreateSerializer(serializers.ModelSerializer):
         # Update Teacher fields
         # instance.teachers.expert = expert
         # instance.teachers.level = level
-        
+
         # Update User fields
         for field in self.fields.keys():
             if field in validated_data:
