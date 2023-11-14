@@ -4,8 +4,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
+from django.contrib.auth import logout
 from rest_framework_simplejwt.tokens import AccessToken
-
 
 from Identity import models as identity_models
 from Identity import serializers as identity_serializers
@@ -32,21 +32,12 @@ class UserRegisterIView(generics.CreateAPIView):
     http_method_names = ['post']
     permission_classes = (AllowAny,)
 
-    def perform_create(self, serializer):
-        """
-        Custom method to perform additional actions after user creation.
-
-        Args:
-            serializer (RegisterSerializer): The serializer instance.
-
-        Returns:
-            Response: JSON response containing the access token and its details.
-        """
-        access, user = serializer.save()
-
-        return Response({
-            "token": access,
-        }, status=status.HTTP_201_CREATED)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class UserTokenLoginView(generics.CreateAPIView):
@@ -80,28 +71,12 @@ class UserTokenLoginView(generics.CreateAPIView):
 
 
 class UserLogoutView(APIView):
-    """
-    View for user logout.
-
-    Args:
-        generics (class): Django REST Framework generics class.
-
-    Returns:
-        Response: JSON response with a success message upon successful user logout.
-    """
+    queryset = User.objects.all()
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        """
-        Custom method to handle user logout.
-
-        Args:
-            request (Request): The HTTP request object.
-
-        Returns:
-            Response: JSON response with a success message.
-        """
-        return Response({'message': 'یوزر با موفقیت از سایت خارج شد..'}, status=status.HTTP_200_OK)
+        logout(request)
+        return Response({'message': 'یوزر با موفقیت از سایت خارج شد.'}, status=status.HTTP_200_OK)
 
 
 class ChangePasswordRequestView(generics.CreateAPIView):
@@ -220,4 +195,4 @@ class ItTeacherListCreateView(generics.ListCreateAPIView):
     serializer_class = identity_serializers.ItTeacherListCreateSerializer
     queryset = User.objects.all()
     http_method_names = ['post', 'get']
-    permission_classes = (IsAuthenticated,custom_permissions.IsItManager)
+    permission_classes = (IsAuthenticated, custom_permissions.IsItManager)

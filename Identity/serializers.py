@@ -1,10 +1,11 @@
 from rest_framework import serializers
 
 from django.core.cache import cache
-from django.contrib.auth import authenticate, login
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from django.core.validators import validate_email
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib.auth.password_validation import validate_password
@@ -18,126 +19,24 @@ User = get_user_model()
 # Authentication Serializers
 
 
-class RegisterSerializer(serializers.Serializer):
-    """
-    Serializer for user registration.
+class RegisterSerializer(serializers.ModelSerializer):
+    password2 = serializers.CharField(
+        write_only=True, label="تایید گذر واژه", style={'input_type': 'password'})
 
-    Attributes:
-        username (str): The desired username for the new user.
-        email (str): The email address of the new user.
-        password1 (str): The password for the new user.
-        password2 (str): Confirmation of the password for the new user.
+    class Meta:
+        model = User
+        fields = ['username', 'email',
+                  'national_code', 'password', 'password2']
+        extra_kwargs = {
+            'password': {'write_only': True, 'style': {'input_type': 'password'}},
+        }
 
-    Methods:
-        validate_username: Validates the uniqueness of the username.
-        validate_email: Validates the uniqueness of the email address.
-        validate_password1: Validates the password according to Django password validation.
-        validate: Validates that password1 and password2 match.
-        save: Creates and returns a new user instance.
-
-    Raises:
-        serializers.ValidationError: If any validation checks fail.
-    """
-    username = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
-    password1 = serializers.CharField(write_only=True, required=True, style={
-                                      'input_type': 'password'})
-    password2 = serializers.CharField(write_only=True, required=True, style={
-                                      'input_type': 'password'})
-
-    def validate_username(self, username):
-        """
-        Validates the uniqueness of the username.
-
-        Args:
-            username (str): The username to be validated.
-
-        Returns:
-            str: The validated username.
-
-        Raises:
-            serializers.ValidationError: If the username is not unique.
-        """
-        if User.objects.filter(username=username).exists():
-            raise serializers.ValidationError(
-                _("نام کاربری قبلا در سامانه ثبت شده است."))
-        return username
-
-    def validate_email(self, email):
-        """
-        Validates the uniqueness of the email address.
-
-        Args:
-            email (str): The email address to be validated.
-
-        Returns:
-            str: The validated email address.
-
-        Raises:
-            serializers.ValidationError: If the email address is not unique.
-        """
-        validate_email(email)
-
-        if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError(
-                _("ایمیل وارد شده قبلا در سامانه ثبت شده است."))
-
-        return email
-
-    def validate_password1(self, password1):
-        """
-        Validates the password according to Django password validation.
-
-        Args:
-            password1 (str): The password to be validated.
-
-        Returns:
-            str: The validated password.
-
-        Raises:
-            serializers.ValidationError: If the password does not meet validation criteria.
-        """
-        try:
-            validate_password(password1)
-        except DjangoValidationError as e:
-            raise serializers.ValidationError(e.messages)
-
-        return password1
-
-    def validate(self, data):
-        """
-        Validates that password1 and password2 match.
-
-        Args:
-            data (dict): The input data containing password1 and password2.
-
-        Returns:
-            dict: The validated data.
-
-        Raises:
-            serializers.ValidationError: If password1 and password2 do not match.
-        """
-        if data['password1'] != data['password2']:
-            raise serializers.ValidationError(
-                _("پسورد ها مطابقت ندارد"))
-
-        return data
-
-    def save(self):
-        """
-        Creates and returns a new user instance.
-
-        Returns:
-            tuple: A tuple containing the user instance and the access token.
-        """
-        user = User.objects.create_user(
-            username=self.validated_data['username'],
-            email=self.validated_data['email'],
-            password=self.validated_data['password1']
-        )
-        access = AccessToken.for_user(user)
-        print(access)
-        return str(access), user
+    def create(self, validated_data):
+        password = validated_data.pop('password2')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
 
 
 class UserTokenLoginSerializer(serializers.Serializer):
@@ -189,7 +88,7 @@ class UserTokenLoginSerializer(serializers.Serializer):
         return data
 
 
-class ChangePasswordRequestSerializer(serializers.Serializer):
+class ChangePasswordRequestSerializer(serializers.ModelSerializer):
     """
     Serializer for requesting a change of password.
 
@@ -202,7 +101,9 @@ class ChangePasswordRequestSerializer(serializers.Serializer):
     Raises:
         serializers.ValidationError: If the user is not found.
     """
-    username = serializers.CharField()
+    class Meta:
+        model = User
+        fields = ["username",]
 
     def validate_username(self, value):
         """
@@ -217,11 +118,7 @@ class ChangePasswordRequestSerializer(serializers.Serializer):
         Raises:
             serializers.ValidationError: If the user is not found.
         """
-        try:
-            user = User.objects.get(username=value)
-        except User.DoesNotExist:
-            raise serializers.ValidationError("کاربر یافت نشد.")
-        return value
+        user = get_object_or_404(User, username=value)
 
 
 class ChangePasswordActionSerializer(serializers.Serializer):
