@@ -301,14 +301,62 @@ class ChangePasswordActionView(generics.CreateAPIView):
 
 
 class ItTeacherListCreateView(generics.ListCreateAPIView):
-    serializer_class = identity_serializers.ItTeacherListCreateSerializer
+    serializer_class = identity_serializers.ItTeacherSerializer
     queryset = User.objects.all()
     http_method_names = ['post', 'get']
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
 
+    def get_queryset(self):
+        return User.objects.filter(is_teacher=True)
 
 
 class ItTeacherRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = identity_serializers.ItTeacherListCreateSerializer
+    serializer_class = identity_serializers.ItTeacherSerializer
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
+
+    def perform_destroy(self, instance):
+        teacher_instance = instance.teachers
+        teacher_instance.delete()
+        instance.delete()
+
+        return Response({'message': 'User and Teacher instances deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class ItStudentListCreateView(generics.ListCreateAPIView):
+    serializer_class = identity_serializers.ItStudentSerializer
+    queryset = User.objects.all()
+    http_method_names = ['post', 'get']
+    permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
+
+    def get_queryset(self):
+        return User.objects.filter(is_student=True)
+
+
+class ItStudentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = identity_serializers.ItStudentSerializer
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
+
+    def perform_destroy(self, instance):
+        student_instance = instance.students
+        student_instance.delete()
+        instance.delete()
+
+        return Response({'message': 'User and student instances deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class ItChancellorListCreateView(generics.ListCreateAPIView):
+    serializer_class = identity_serializers.ItChancellorSerializer
+    queryset = User.objects.all()
+    http_method_names = ['post', 'get']
+    permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
+
+    def get_queryset(self):
+        return User.objects.filter(is_chancellor=True)
+
+
+class ItChancellorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = identity_serializers.ItChancellorSerializer
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)

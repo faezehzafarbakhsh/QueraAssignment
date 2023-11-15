@@ -13,9 +13,21 @@ urlpatterns = [
          identity_views.ChangePasswordActionView.as_view()),
 
     # Users crud
+
+    # Teachers
     path('admin/professors/', identity_views.ItTeacherListCreateView.as_view()),
     path('admin/professors/<int:pk>/',
          identity_views.ItTeacherRetrieveUpdateDestroyView.as_view()),
+    
+    # Students
+    path('admin/students/', identity_views.ItStudentListCreateView.as_view()),
+    path('admin/students/<int:pk>/',
+         identity_views.ItStudentRetrieveUpdateDestroyView.as_view()),
+
+    # Chancellors
+    path('admin/assistants/', identity_views.ItChancellorListCreateView.as_view()),
+    path('admin/assistants/<int:pk>/',
+         identity_views.ItChancellorRetrieveUpdateDestroyView.as_view()),
 
 
 

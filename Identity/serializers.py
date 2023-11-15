@@ -12,6 +12,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from Identity import models as identity_models
+from EduTerm import models as ed_term_models
 from Identity import variable_names as vn_identity
 from Identity import custom_classes
 
@@ -301,7 +302,7 @@ class ChangePasswordActionSerializer(serializers.Serializer):
 # It Manager Serializers
 
 
-class ItTeacherListCreateSerializer(serializers.ModelSerializer):
+class ItTeacherSerializer(serializers.ModelSerializer):
     expert = serializers.CharField(
         source='teachers.expert', label=vn_identity.TEACHER_EXPERT, max_length=64, )
     level = serializers.CharField(
@@ -321,8 +322,9 @@ class ItTeacherListCreateSerializer(serializers.ModelSerializer):
 
         validated_data['password'] = custom_classes.GlobalFunction.make_random_password()
 
+        print(validated_data['password'])
         # send password as a email to user
-        
+
         user_instance = User.objects.create_user(**validated_data)
 
         identity_models.Teacher.objects.create(
@@ -338,19 +340,6 @@ class ItTeacherListCreateSerializer(serializers.ModelSerializer):
         expert = teachers_data.get('expert')
         level = teachers_data.get('level')
 
-        # # Update User fields
-        # instance.username = validated_data.get('username', instance.username)
-        # instance.password = validated_data.get('password', instance.password)
-        # instance.email = validated_data.get('email', instance.email)
-        # instance.gender = validated_data.get('gender', instance.gender)
-        # instance.mobile = validated_data.get('mobile', instance.mobile)
-        # instance.national_code = validated_data.get(
-        #     'national_code', instance.national_code)
-
-        # Update Teacher fields
-        # instance.teachers.expert = expert
-        # instance.teachers.level = level
-
         # Update User fields
         for field in self.fields.keys():
             if field in validated_data:
@@ -363,3 +352,93 @@ class ItTeacherListCreateSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class ItStudentSerializer(serializers.ModelSerializer):
+    entry_year = serializers.DateField(
+        source='students.entry_year', label=vn_identity.STUDENT_ENTRY_YEAR)
+    entry_term = serializers.ChoiceField(
+        source='students.entry_term', choices=identity_models.Student.EntryChoices.choices, label=vn_identity.STUDENT_ENTRY_TERM)
+    current_term = serializers.PrimaryKeyRelatedField(queryset=ed_term_models.Term.objects.all(),
+                                                      source='students.current_term',
+                                                      write_only=True,
+                                                      label=vn_identity.STUDENT_CURRENT_TERM)
+    average = serializers.FloatField(
+        source='students.average', label=vn_identity.STUDENT_AVERAGE)
+    academic_year = serializers.ChoiceField(
+        source='students.academic_year', choices=identity_models.Student.AcademicChoices.choices, label=vn_identity.STUDENT_ACADEMIC_YEAR)
+
+    class Meta:
+        model = identity_models.User
+        fields = ['username', 'email', 'gender',
+                  'mobile', 'national_code', 'entry_year', 'entry_term', 'current_term', 'average', 'academic_year']
+
+    def create(self, validated_data):
+        students_data = validated_data.pop('students', {})
+
+        entry_year = students_data.get('entry_year')
+        entry_term = students_data.get('entry_term')
+        current_term = students_data.get('current_term')
+        average = students_data.get('average')
+        academic_year = students_data.get('academic_year')
+
+        validated_data['is_student'] = True
+
+        validated_data['password'] = custom_classes.GlobalFunction.make_random_password()
+
+        print(validated_data['password'])
+        # send password as a email to user
+
+        user_instance = User.objects.create_user(**validated_data)
+
+        identity_models.Teacher.objects.create(
+            user=user_instance,
+            entry_year=entry_year,
+            entry_term=entry_term,
+            current_term=current_term,
+            average=average,
+            academic_year=academic_year,
+        )
+
+        return user_instance
+
+    def update(self, instance, validated_data):
+        students_data = validated_data.pop('students', {})
+
+        entry_year = students_data.get('entry_year')
+        entry_term = students_data.get('entry_term')
+        current_term = students_data.get('current_term')
+        average = students_data.get('average')
+        academic_year = students_data.get('academic_year')
+
+        # Update User fields
+        for field in self.fields.keys():
+            if field in validated_data:
+                setattr(instance, field, validated_data[field])
+
+        # Update Student fields
+        for field in ['entry_year', 'entry_term', 'current_term', 'average', 'academic_year']:
+            setattr(instance.students, field, locals()[field])
+
+        instance.save()
+
+        return instance
+
+
+class ItChancellorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = identity_models.User
+        fields = ['username', 'email', 'gender',
+                  'mobile', 'national_code',]
+
+    def create(self, validated_data):
+        validated_data['is_chancellor'] = True
+
+        validated_data['password'] = custom_classes.GlobalFunction.make_random_password()
+
+        print(validated_data['password'])
+        # send password as a email to user
+
+        user_instance = User.objects.create_user(**validated_data)
+
+        return user_instance

@@ -1,6 +1,7 @@
 from django.core.cache import cache
 from rest_framework_simplejwt.tokens import AccessToken
-
+import secrets
+import string
 
 class CacheManager():
     @staticmethod
@@ -38,5 +39,7 @@ class CacheManager():
 
 class GlobalFunction:
     @staticmethod
-    def make_random_password():
-        return "1234"
+    def make_random_password(length=6):
+        characters = string.ascii_letters + string.digits + string.punctuation
+        password = ''.join(secrets.choice(characters) for _ in range(length))
+        return password
