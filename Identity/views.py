@@ -301,6 +301,21 @@ class ChangePasswordActionView(generics.CreateAPIView):
 
 
 class ItTeacherListCreateView(generics.ListCreateAPIView):
+    """
+    View for listing and creating IT teachers.
+
+    Attributes:
+        serializer_class: The serializer class for handling IT teacher data.
+        queryset: The queryset of User objects.
+        http_method_names: The allowed HTTP methods (POST and GET).
+        permission_classes: The permission classes (IsAuthenticated, IsItManager).
+
+    Methods:
+        get_queryset: Retrieves the queryset of IT teachers.
+
+    Raises:
+        None
+    """
     serializer_class = identity_serializers.ItTeacherSerializer
     queryset = User.objects.all()
     http_method_names = ['post', 'get']
@@ -311,6 +326,20 @@ class ItTeacherListCreateView(generics.ListCreateAPIView):
 
 
 class ItTeacherRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    View for retrieving, updating, and destroying an IT teacher.
+
+    Attributes:
+        serializer_class: The serializer class for handling IT teacher data.
+        queryset: The queryset of User objects.
+        permission_classes: The permission classes (IsAuthenticated, IsItManager).
+
+    Methods:
+        perform_destroy: Deletes the IT teacher and the corresponding User instance.
+
+    Raises:
+        None
+    """
     serializer_class = identity_serializers.ItTeacherSerializer
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
@@ -324,6 +353,21 @@ class ItTeacherRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class ItStudentListCreateView(generics.ListCreateAPIView):
+    """
+    View for listing and creating IT students.
+
+    Attributes:
+        serializer_class: The serializer class for handling IT student data.
+        queryset: The queryset of User objects.
+        http_method_names: The allowed HTTP methods (POST and GET).
+        permission_classes: The permission classes (IsAuthenticated, IsItManager).
+
+    Methods:
+        get_queryset: Returns the queryset of IT students.
+
+    Raises:
+        None
+    """
     serializer_class = identity_serializers.ItStudentSerializer
     queryset = User.objects.all()
     http_method_names = ['post', 'get']
@@ -334,6 +378,19 @@ class ItStudentListCreateView(generics.ListCreateAPIView):
 
 
 class ItStudentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    View for retrieving, updating, and destroying an IT student.
+
+    Attributes:
+        serializer_class: The serializer class for handling IT student data.
+        queryset: The queryset of User objects.
+        permission_classes: The permission classes (IsAuthenticated, IsItManager).
+
+    Methods:
+        None
+
+    Raises:
+        None"""
     serializer_class = identity_serializers.ItStudentSerializer
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
@@ -347,6 +404,21 @@ class ItStudentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class ItChancellorListCreateView(generics.ListCreateAPIView):
+    """
+    View for listing and creating IT chancellors.
+
+    Attributes:
+        serializer_class: The serializer class for handling IT chancellor data.
+        queryset: The queryset of User objects.
+        http_method_names: The allowed HTTP methods (POST and GET).
+        permission_classes: The permission classes (IsAuthenticated, IsItManager).
+
+    Methods:
+        get_queryset: Returns the queryset of IT chancellors.
+
+    Raises:
+        None
+    """
     serializer_class = identity_serializers.ItChancellorSerializer
     queryset = User.objects.all()
     http_method_names = ['post', 'get']
@@ -357,6 +429,20 @@ class ItChancellorListCreateView(generics.ListCreateAPIView):
 
 
 class ItChancellorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    View for retrieving, updating, and deleting IT chancellors.
+
+    Attributes:
+        serializer_class: The serializer class for handling IT chancellor data.
+        queryset: The queryset of User objects.
+        permission_classes: The permission classes (IsAuthenticated, IsItManager).
+
+    Methods:
+        perform_destroy: Deletes the IT chancellor instance.
+
+    Raises:
+        None
+    """
     serializer_class = identity_serializers.ItChancellorSerializer
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)

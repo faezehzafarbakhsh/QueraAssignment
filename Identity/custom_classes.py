@@ -3,6 +3,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 import secrets
 import string
 
+
 class CacheManager():
     @staticmethod
     def set_cache_token(user):
@@ -40,6 +41,18 @@ class CacheManager():
 class GlobalFunction:
     @staticmethod
     def make_random_password(length=6):
+        """
+        Generates a random password.
+
+        Args:
+            length (int): The length of the password. Default is 6.
+
+        Returns:
+            str: The randomly generated password.
+
+        Raises:
+            None
+        """
         characters = string.ascii_letters + string.digits + string.punctuation
         password = ''.join(secrets.choice(characters) for _ in range(length))
         return password

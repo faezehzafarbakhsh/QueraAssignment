@@ -303,6 +303,20 @@ class ChangePasswordActionSerializer(serializers.Serializer):
 
 
 class ItTeacherSerializer(serializers.ModelSerializer):
+    """
+    Serializer for IT teachers.
+
+    Attributes:
+        expert: The field representing the expert of the IT teacher.
+        level: The field representing the level of the IT teacher.
+
+    Methods:
+        create: Creates a new IT teacher instance.
+        update: Updates the information of an existing IT teacher instance.
+
+    Raises:
+        None
+    """
     expert = serializers.CharField(
         source='teachers.expert', label=vn_identity.TEACHER_EXPERT, max_length=64, )
     level = serializers.CharField(
@@ -355,6 +369,23 @@ class ItTeacherSerializer(serializers.ModelSerializer):
 
 
 class ItStudentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for IT students.
+
+    Attributes:
+        entry_year: The field representing the entry year of the IT student.
+        entry_term: The field representing the entry term of the IT student.
+        current_term: The field representing the current term of the IT student.
+        average: The field representing the average of the IT student.
+        academic_year: The field representing the academic year of the IT student.
+
+    Methods:
+        create: Creates a new IT student instance.
+        update: Updates the information of an existing IT student instance.
+
+    Raises:
+        None
+    """
     entry_year = serializers.DateField(
         source='students.entry_year', label=vn_identity.STUDENT_ENTRY_YEAR)
     entry_term = serializers.ChoiceField(
@@ -426,6 +457,18 @@ class ItStudentSerializer(serializers.ModelSerializer):
 
 
 class ItChancellorSerializer(serializers.ModelSerializer):
+    """
+    Serializer for IT chancellors.
+
+    Attributes:
+        None
+
+    Methods:
+        create: Creates a new IT chancellor instance.
+
+    Raises:
+        None
+    """
     class Meta:
         model = identity_models.User
         fields = ['username', 'email', 'gender',
