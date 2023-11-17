@@ -29,6 +29,8 @@ urlpatterns = [
     path('admin/assistants/<int:pk>/',
          identity_views.ItChancellorRetrieveUpdateDestroyView.as_view()),
 
+     # Token
+     path('token/', identity_views.CustomTokenObtainPairView.as_view(),)
 
 
 ]
