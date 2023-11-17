@@ -12,6 +12,9 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = edu_base_models.Course
         fields = ['name', 'college', 'unit_count', 'course_type', ]
+        
+    def validate_user(self, attrs):
+        return super().validate(attrs)
 
 
 class CourseRelationSerializer(serializers.ModelSerializer):

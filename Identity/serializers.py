@@ -119,61 +119,6 @@ class UserTokenLoginSerializer(serializers.Serializer):
         return data
 
 
-class UserTokenLoginSerializer(serializers.Serializer):
-    """
-    Serializer for user login using a JWT token.
-
-    Attributes:
-        token (str): The JWT token for user authentication.
-
-    Methods:
-        validate: Validates the presence of the token, authenticates the user, and logs them in.
-
-    Raises:
-        serializers.ValidationError: If the token is missing, the user is not found, or an exception occurs during authentication.
-
-    Notes:
-        This serializer is designed to handle user login using a JWT token. It validates the presence of the token,
-        authenticates the user, and logs them in if they are active. If any issues occur during this process,
-        a `serializers.ValidationError` is raised with relevant error messages.
-
-    """
-    token = serializers.CharField()
-
-    def validate(self, data):
-        """
-        Validates the presence of the token, authenticates the user, and logs them in.
-
-        Args:
-            data (dict): The input data containing the token.
-
-        Returns:
-            dict: The validated data containing the authenticated user.
-
-        Raises:
-            serializers.ValidationError: If the token is missing, the user is not found, or an exception occurs during authentication.
-        """
-        token = data.get('token')
-
-        if not token:
-            raise serializers.ValidationError('توکن را وارد کنید.')
-
-        try:
-            user_id = AccessToken(token).payload.get('user_id')
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            raise serializers.ValidationError('کاربر یافت نشد.')
-        except Exception as e:
-            raise serializers.ValidationError(str(e))
-
-        # Manually check if the user is active and log them in
-        if user.is_active:
-            login(self.context.get('request'), user)
-
-        data['user'] = user
-        return data
-
-
 class ChangePasswordRequestSerializer(serializers.Serializer):
     """
     Serializer for requesting a change of password.

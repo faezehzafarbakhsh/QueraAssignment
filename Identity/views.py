@@ -89,37 +89,6 @@ class UserTokenLoginView(generics.CreateAPIView):
     http_method_names = ['post']
     permission_classes = (AllowAny,)
 
-    def get_serializer_context(self):
-        """
-        Retrieves the context for the serializer.
-
-        Returns:
-            dict: The context for the serializer.
-
-        Raises:
-            None
-        """
-        context = super().get_serializer_context()
-        return context
-
-    def perform_create(self, serializer):
-        """
-        Validates and processes the user login data.
-
-        Args:
-            serializer: The serializer instance.
-
-        Returns:
-            Response: JSON response with a success message upon successful user login.
-
-        Raises:
-            None
-        """
-        context = self.get_serializer_context()
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        return super().perform_create(serializer)
-
     def post(self, request, *args, **kwargs):
         """
         Handles the POST request and returns a JSON response upon successful user login.
@@ -135,6 +104,10 @@ class UserTokenLoginView(generics.CreateAPIView):
         Raises:
             None
         """
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
         return Response({"message": "کاربر با موفقیت وارد سایت شد."}, status=status.HTTP_200_OK)
 
 
@@ -277,7 +250,7 @@ class ChangePasswordActionView(generics.CreateAPIView):
 
         Raises:
             None
-            
+
         """
         user_id = AccessToken(request.data['token']).payload['user_id']
         stored_token_for_user = custom_classes.CacheManager.get_cache_token(
