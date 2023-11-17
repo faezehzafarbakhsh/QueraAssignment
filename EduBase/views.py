@@ -33,7 +33,7 @@ class CourseRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = edu_base_models.Course.objects.all()
     http_method_names = ['get', 'put', 'delete']
     permission_classes = (IsAuthenticated, permission_classes.IsItManager |
-                          permission_classes.IsChancellor, permission_classes.IsChancellorInSameCollege)
+                          permission_classes.IsChancellor & permission_classes.IsChancellorInSameCollege)
 
 
 class CourseRelationListCreateView(generics.ListCreateAPIView):
