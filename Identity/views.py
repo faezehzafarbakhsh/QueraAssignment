@@ -196,7 +196,7 @@ class ChangePasswordRequestView(generics.GenericAPIView):
     serializer_class = identity_serializers.ChangePasswordRequestSerializer
     queryset = User.objects.all()
     http_method_names = ['post']
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
         """
@@ -249,16 +249,16 @@ class ChangePasswordActionView(generics.CreateAPIView):
     http_method_names = ['post', 'get']
     permission_classes = (AllowAny,)
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        user = self.request.user
-        extra_context = {
-            "stored_token_for_user": custom_classes.CacheManager.get_cache_token(user)
-        }
-        context.update(extra_context)
-        return context
+    # def get_serializer_context(self):
+    #     context = super().get_serializer_context()
+    #     user = self.request.user
+    #     extra_context = {
+    #         "stored_token_for_user": custom_classes.CacheManager.get_cache_token(user)
+    #     }
+    #     context.update(extra_context)
+    #     return context
 
-    def perform_create(self, serializer):
+    def perform_create(self,  serializer):
         """
         Changes the user's password based on the provided token.
 
@@ -268,6 +268,7 @@ class ChangePasswordActionView(generics.CreateAPIView):
         Returns:
             None
         """
+
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
@@ -285,8 +286,15 @@ class ChangePasswordActionView(generics.CreateAPIView):
 
         Raises:
             None
+            
         """
-        serializer = self.get_serializer(data=request.data)
+        user_id = AccessToken(request.data['token']).payload['user_id']
+        stored_token_for_user = custom_classes.CacheManager.get_cache_token(
+            user_id)
+        serializer = self.get_serializer(data=request.data, context={
+                                         "stored_token_for_user": stored_token_for_user,
+                                         'user_id': user_id
+                                         })
         self.perform_create(serializer)
 
         custom_classes.CacheManager.delete_cache_token(request.user)

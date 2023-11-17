@@ -291,7 +291,8 @@ class ChangePasswordActionSerializer(serializers.Serializer):
         Returns:
             User: The user object with the updated password.
         """
-        user = self.context['request'].user
+        user_id = self.context['user_id']
+        user = User.objects.get(id=user_id)
 
         # Reset the password for the user
         user.password = make_password(validated_data['new_password'])
@@ -402,7 +403,7 @@ class ItStudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = identity_models.User
         fields = ['username', 'email', 'gender',
-                  'mobile', 'national_code', 'entry_year', 'entry_term', 'current_term', 'average', 'academic_year']
+                  'mobile', 'national_code', 'entry_year', 'edu_field', 'entry_term', 'current_term', 'average', 'academic_year']
 
     def create(self, validated_data):
         students_data = validated_data.pop('students', {})
@@ -472,7 +473,7 @@ class ItChancellorSerializer(serializers.ModelSerializer):
     class Meta:
         model = identity_models.User
         fields = ['username', 'email', 'gender',
-                  'mobile', 'national_code',]
+                  'mobile', 'national_code', 'college',]
 
     def create(self, validated_data):
         validated_data['is_chancellor'] = True

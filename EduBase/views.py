@@ -23,14 +23,17 @@ class CourseListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_base_serializers.CourseSerializer
     queryset = edu_base_models.Course.objects.all()
     http_method_names = ['get', 'post']
-    permission_classes = (AllowAny,)
+    perm = (permission_classes.IsItManager or permission_classes.IsChancellor)
+    permission_classes = (IsAuthenticated, permission_classes.IsItManager | permission_classes.IsChancellor)
 
 
 class CourseRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = edu_base_serializers.CourseSerializer
     queryset = edu_base_models.Course.objects.all()
     http_method_names = ['get', 'put', 'delete']
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated, permission_classes.IsItManager | permission_classes.IsChancellor)
+
+    
 
 
 class CourseRelationListCreateView(generics.ListCreateAPIView):

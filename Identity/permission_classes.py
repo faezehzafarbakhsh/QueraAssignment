@@ -30,17 +30,14 @@ class IsTeacher(BasePermission):
 
 class IsChancellor(BasePermission):
     """
-    Custom permission to check if the user is a Chancellor.
+    Custom permission to restrict access based on user roles and course college.
+
+    Returns:
+        bool: True if the user is an authenticated Chancellor and the course college matches; False otherwise.
     """
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.is_chancellor
-    
-    def has_permission_for_courses(self, request, view, course):
-        # Check if the user is a chancellor
-        if not request.user.is_authenticated or not request.user.is_chancellor:
-            return False
+        course = getattr(view, 'queryset', None)
+        is_chancellor = request.user.is_authenticated and request.user.is_chancellor
 
-        # Check if the college of the course is equal to the college of the chancellor
-        return request.user.college == course.college
-        
+        return is_chancellor and course.exists() and request.user.college == course.first().college
