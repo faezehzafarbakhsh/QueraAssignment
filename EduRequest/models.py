@@ -41,7 +41,7 @@ class StudentRequest(models.Model):
     user_answer = models.ForeignKey(get_user_model(), on_delete=models.PROTECT,
                                     verbose_name=vn_edu_request.STUDENT_REQUEST_USER_ANSWER,
                                     limit_choices_to=Q(is_teacher=True) | Q(is_chancellor=True),
-                                    related_name='student_request_answers')
+                                    related_name='student_request_answers', null=True, blank=True)
     request_type = models.IntegerField(choices=RequestTypeChoices.choices,
                                        verbose_name=vn_edu_request.STUDENT_REQUEST_REQUEST_TYPE)
 
