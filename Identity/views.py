@@ -430,36 +430,37 @@ class ChancellorStudentsListView(generics.ListAPIView):
         IsAuthenticated, custom_permissions.IsItManager | custom_permissions.IsChancellor)
 
     def get_queryset(self):
-        # Assuming your Student model has a 'college' field
-        college = self.request.user.college if self.request.user.is_chancellor else None
+        if self.request.user.is_chancellor:
+            college = self.request.user.college if self.request.user.is_chancellor else None
 
-        if college:
-            # Filter students based on the chancellor's college
-            queryset = User.objects.filter(
-                is_student=True, college=college)
+            if college:
+                queryset = User.objects.filter(
+                    is_student=True, college=college)
+            else:
+                queryset = User.objects.none()
         else:
-            # If the user is not a chancellor, return an empty queryset
-            queryset = User.objects.none()
+            queryset = User.objects.all()
 
         return queryset
+
 
 
 class ChancellorStudentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
     serializer_class = identity_serializers.ChancellorStudentSerializer
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager |
-                          custom_permissions.IsChancellor )
-    
-    def get_queryset(self):
-        # Assuming your Student model has a 'college' field
-        college = self.request.user.college if self.request.user.is_chancellor else None
+                          custom_permissions.IsChancellor)
 
-        if college:
-            # Filter students based on the chancellor's college
-            queryset = User.objects.filter(
-                is_student=True, college=college)
+    def get_queryset(self):
+        if self.request.user.is_chancellor:
+            college = self.request.user.college if self.request.user.is_chancellor else None
+
+            if college:
+                queryset = User.objects.filter(
+                    is_student=True, college=college)
+            else:
+                queryset = User.objects.none()
         else:
-            # If the user is not a chancellor, return an empty queryset
-            queryset = User.objects.none()
+            queryset = User.objects.all()
 
         return queryset
