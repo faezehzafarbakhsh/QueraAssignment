@@ -30,10 +30,23 @@ class CourseListCreateView(generics.ListCreateAPIView):
 
 class CourseRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = edu_base_serializers.CourseSerializer
-    queryset = edu_base_models.Course.objects.all()
     http_method_names = ['get', 'put', 'delete']
     permission_classes = (IsAuthenticated, permission_classes.IsItManager |
-                          permission_classes.IsChancellor & permission_classes.IsChancellorInSameCollege)
+                          permission_classes.IsChancellor)
+
+    def get_queryset(self):
+        if self.request.user.is_chancellor:
+            college = self.request.user.college if self.request.user.is_chancellor else None
+
+            if college:
+                queryset = edu_base_models.Course.objects.filter(
+                    college=college)
+            else:
+                queryset = edu_base_models.Course.objects.none()
+        else:
+            queryset = edu_base_models.Course.objects.all()
+
+        return queryset
 
 
 class CourseRelationListCreateView(generics.ListCreateAPIView):

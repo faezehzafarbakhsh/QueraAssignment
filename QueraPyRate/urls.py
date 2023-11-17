@@ -30,5 +30,6 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api/', include('EduBase.urls')),
     path('api/', include('Identity.urls')),
+    path('api/', include('EduTerm.urls')),
 
 ]

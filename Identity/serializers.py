@@ -270,7 +270,7 @@ class ItTeacherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = identity_models.User
-        fields = ['username', 'email', 'gender',
+        fields = ['username', 'email', 'gender','college',
                   'mobile', 'national_code', 'expert', 'level']
 
     def create(self, validated_data):
@@ -347,7 +347,7 @@ class ItStudentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = identity_models.User
-        fields = ['username', 'email', 'gender',
+        fields = ['username', 'email', 'gender','college', 
                   'mobile', 'national_code', 'entry_year', 'edu_field', 'entry_term', 'current_term', 'average', 'academic_year']
 
     def create(self, validated_data):
@@ -368,7 +368,7 @@ class ItStudentSerializer(serializers.ModelSerializer):
 
         user_instance = User.objects.create_user(**validated_data)
 
-        identity_models.Teacher.objects.create(
+        identity_models.Student.objects.create(
             user=user_instance,
             entry_year=entry_year,
             entry_term=entry_term,
@@ -431,3 +431,108 @@ class ItChancellorSerializer(serializers.ModelSerializer):
         user_instance = User.objects.create_user(**validated_data)
 
         return user_instance
+
+# Chancellor Serializers
+
+
+class ChancellorTeacherSerializer(serializers.ModelSerializer):
+    """
+    Serializer for IT teachers.
+
+    Attributes:
+        expert: The field representing the expert of the IT teacher.
+        level: The field representing the level of the IT teacher.
+
+    Methods:
+        create: Creates a new IT teacher instance.
+        update: Updates the information of an existing IT teacher instance.
+
+    Raises:
+        None
+    """
+    expert = serializers.CharField(
+        source='teachers.expert', label=vn_identity.TEACHER_EXPERT, max_length=64, )
+    level = serializers.CharField(
+        source='teachers.level', label=vn_identity.TEACHER_LEVEL, max_length=64, )
+
+    class Meta:
+        model = identity_models.User
+        fields = ['username', 'email', 'gender',
+                  'mobile', 'national_code', 'expert', 'level']
+
+    def update(self, instance, validated_data):
+        teachers_data = validated_data.pop('teachers', {})
+        expert = teachers_data.get('expert')
+        level = teachers_data.get('level')
+
+        # Update User fields
+        for field in self.fields.keys():
+            if field in validated_data:
+                setattr(instance, field, validated_data[field])
+
+        # Update Teacher fields
+        for field in ['expert', 'level']:
+            setattr(instance.teachers, field, locals()[field])
+
+        instance.save()
+
+        return instance
+
+
+class ChancellorStudentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for IT students.
+
+    Attributes:
+        entry_year: The field representing the entry year of the IT student.
+        entry_term: The field representing the entry term of the IT student.
+        current_term: The field representing the current term of the IT student.
+        average: The field representing the average of the IT student.
+        academic_year: The field representing the academic year of the IT student.
+
+    Methods:
+        create: Creates a new IT student instance.
+        update: Updates the information of an existing IT student instance.
+
+    Raises:
+        None
+    """
+    entry_year = serializers.DateField(
+        source='students.entry_year', label=vn_identity.STUDENT_ENTRY_YEAR)
+    entry_term = serializers.ChoiceField(
+        source='students.entry_term', choices=identity_models.Student.EntryChoices.choices, label=vn_identity.STUDENT_ENTRY_TERM)
+    current_term = serializers.PrimaryKeyRelatedField(queryset=ed_term_models.Term.objects.all(),
+                                                      source='students.current_term',
+                                                      write_only=True,
+                                                      label=vn_identity.STUDENT_CURRENT_TERM)
+    average = serializers.FloatField(
+        source='students.average', label=vn_identity.STUDENT_AVERAGE)
+    academic_year = serializers.ChoiceField(
+        source='students.academic_year', choices=identity_models.Student.AcademicChoices.choices, label=vn_identity.STUDENT_ACADEMIC_YEAR)
+
+    class Meta:
+        model = identity_models.User
+        fields = ['username', 'email', 'gender',
+                  'mobile', 'national_code', 'entry_year', 'edu_field', 'entry_term', 'current_term', 'average', 'academic_year']
+
+    def update(self, instance, validated_data):
+        students_data = validated_data.pop('students', {})
+
+        entry_year = students_data.get('entry_year')
+        entry_term = students_data.get('entry_term')
+        current_term = students_data.get('current_term')
+        average = students_data.get('average')
+        academic_year = students_data.get('academic_year')
+
+        # Update User fields
+        for field in self.fields.keys():
+            if field in validated_data:
+                setattr(instance, field, validated_data[field])
+
+        # Update Student fields
+        for field in ['entry_year', 'entry_term', 'current_term', 'average', 'academic_year']:
+            setattr(instance.students, field, locals()[field])
+
+        instance.save()
+
+        return instance
