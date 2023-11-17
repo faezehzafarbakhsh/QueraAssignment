@@ -165,3 +165,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
 }
+
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, "locale"),
+)

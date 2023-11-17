@@ -1,0 +1,421 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-11-17 13:52+0330\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: EduBase/variable_names.py:4
+msgid "نام دانشکده"
+msgstr "college name"
+
+#: EduBase/variable_names.py:7
+msgid "نوع رابطه"
+msgstr "relation type"
+
+#: EduBase/variable_names.py:8
+msgid "درس رابطه"
+msgstr "course relation"
+
+#: EduBase/variable_names.py:9
+msgid "درس پایه"
+msgstr "base course"
+
+#: EduBase/variable_names.py:12
+msgid "نام درس"
+msgstr "course name"
+
+#: EduBase/variable_names.py:13
+msgid "دانشکده ارائه دهنده"
+msgstr "provider college"
+
+#: EduBase/variable_names.py:14
+msgid "تعداد واحد درس"
+msgstr "number of course unit"
+
+#: EduBase/variable_names.py:15
+msgid "نوع درس"
+msgstr "course type"
+
+#: EduBase/variable_names.py:18
+msgid "نام رشته"
+msgstr "education field"
+
+#: EduBase/variable_names.py:19
+msgid "گروه تخصصی"
+msgstr "specific group"
+
+#: EduBase/variable_names.py:20
+msgid "تعداد واحد"
+msgstr "unit count"
+
+#: EduBase/variable_names.py:21
+msgid "مقطع تحصیلی"
+msgstr "education grade"
+
+#: EduBase/variable_names.py:23
+msgid "کاردانی"
+msgstr "grade associate degree"
+
+#: EduBase/variable_names.py:24
+msgid "کارشناسی"
+msgstr "grade under graduate"
+
+#: EduBase/variable_names.py:25
+msgid "کارشناسی ارشد"
+msgstr "grade masters degree"
+
+#: EduBase/variable_names.py:26
+msgid "دکتری"
+msgstr "grade phd"
+
+#: EduBase/variable_names.py:28
+msgid "عمومی"
+msgstr "general"
+
+#: EduBase/variable_names.py:29
+msgid "تخصصی"
+msgstr "specialized"
+
+#: EduBase/variable_names.py:30
+msgid "پایه"
+msgstr "base"
+
+#: EduBase/variable_names.py:31
+msgid "اختیاری"
+msgstr "optional"
+
+#: EduBase/variable_names.py:33
+msgid "هم نیاز"
+msgstr "simultaneous requisite"
+
+#: EduBase/variable_names.py:34
+msgid "پیش نیاز"
+msgstr "pre requisite"
+
+#: EduEnroll/variable_names.py:4
+msgid "انتظار"
+msgstr "pending"
+
+#: EduEnroll/variable_names.py:5
+msgid "تایید شده"
+msgstr "approved"
+
+#: EduEnroll/variable_names.py:6
+msgid "رد شد"
+msgstr "rejected"
+
+#: EduEnroll/variable_names.py:7 EduRequest/variable_names.py:4
+#: EduTerm/variable_names.py:18
+msgid "ترم"
+msgstr "term"
+
+#: EduEnroll/variable_names.py:8 EduEnroll/variable_names.py:20
+#: EduRequest/variable_names.py:3 EduRequest/variable_names.py:15
+msgid "دانشجو"
+msgstr "student"
+
+#: EduEnroll/variable_names.py:9
+msgid "استاد راهنما"
+msgstr "teacher assistant"
+
+#: EduEnroll/variable_names.py:10 EduEnroll/variable_names.py:21
+#: EduRequest/variable_names.py:8
+msgid "وضعیت"
+msgstr "status"
+
+#: EduEnroll/variable_names.py:11
+msgid "توضیحات استاد راهنما"
+msgstr "teacher assistant description"
+
+#: EduEnroll/variable_names.py:12
+msgid "تعداد ترم گذرانده"
+msgstr "taken term number"
+
+#: EduEnroll/variable_names.py:15
+msgid "ثبت نام کرده"
+msgstr "course enrolled"
+
+#: EduEnroll/variable_names.py:16
+msgid "حذف شده"
+msgstr "course deleted"
+
+#: EduEnroll/variable_names.py:17
+msgid "کامل شده"
+msgstr "course completed"
+
+#: EduEnroll/variable_names.py:18
+msgid "درس ترم"
+msgstr "course term"
+
+#: EduEnroll/variable_names.py:19
+msgid "نمره"
+msgstr "score"
+
+#: EduRequest/variable_names.py:5
+msgid "درس ترمی"
+msgstr "course term"
+
+#: EduRequest/variable_names.py:6
+msgid "توضیحات درخواست"
+msgstr "description request"
+
+#: EduRequest/variable_names.py:7
+msgid "پاسخ"
+msgstr "answer"
+
+#: EduRequest/variable_names.py:9
+msgid "دارای سنوات تحصیلی"
+msgstr "has academic year"
+
+#: EduRequest/variable_names.py:10
+msgid "توضیحات معاون آموزشی"
+msgstr "chancellor description"
+
+#: EduRequest/variable_names.py:11
+msgid "نوع درخواست"
+msgstr "request type"
+
+#: EduRequest/variable_names.py:16
+msgid "ترم تحصیلی"
+msgstr "term"
+
+#: EduRequest/variable_names.py:17
+msgid "محل صدور گواهی"
+msgstr "certificate city"
+
+#: EduRequest/variable_names.py:20
+msgid "پذیرش"
+msgstr "accept"
+
+#: EduRequest/variable_names.py:21
+msgid "رد شده"
+msgstr "rejected"
+
+#: EduRequest/variable_names.py:22
+msgid "در حال بررسی"
+msgstr "in progress"
+
+#: EduRequest/variable_names.py:23
+msgid "درخواست حذف و اضافه"
+msgstr "late add drop"
+
+#: EduRequest/variable_names.py:24
+msgid "درخواست اشتغال به تحصیل"
+msgstr "employment in education"
+
+#: EduRequest/variable_names.py:25
+msgid "درخواست ثبت نام"
+msgstr "registering"
+
+#: EduRequest/variable_names.py:26
+msgid "درخواست تجدید نظر"
+msgstr "appeal request"
+
+#: EduRequest/variable_names.py:27
+msgid "درخواست حذف ترم"
+msgstr "delete student semester"
+
+#: EduRequest/variable_names.py:28
+msgid "درخواست حذف اضطراری دانشجو"
+msgstr "student emergency removal"
+
+#: EduTerm/variable_names.py:4
+msgid "تاریخ شروع انتخاب واحد"
+msgstr "enrollment start datetime"
+
+#: EduTerm/variable_names.py:5
+msgid "تاریخ پایان انتخاب واحد"
+msgstr "enrollment end datetime"
+
+#: EduTerm/variable_names.py:6
+msgid "تاریخ شروع کلاس‌ها"
+msgstr "class start datetime"
+
+#: EduTerm/variable_names.py:7
+msgid "تاریخ پایان کلاس‌ها"
+msgstr "class end datetime"
+
+#: EduTerm/variable_names.py:8
+msgid "تاریخ شروع حذف واضافه"
+msgstr "modify start datetime"
+
+#: EduTerm/variable_names.py:9
+msgid "تاریخ پایان حذف و اضافه"
+msgstr "modify end datetime"
+
+#: EduTerm/variable_names.py:10
+msgid "زمان حذف اضطراری"
+msgstr "emergency course drop end datetime"
+
+#: EduTerm/variable_names.py:11
+msgid " تاریخ شروع امتحان‌ها"
+msgstr "exam start date"
+
+#: EduTerm/variable_names.py:12
+msgid "پایان ترم"
+msgstr "term end date"
+
+#: EduTerm/variable_names.py:13
+msgid "ترم فعال جاری"
+msgstr "active term"
+
+#: EduTerm/variable_names.py:17
+msgid "درس"
+msgstr "course"
+
+#: EduTerm/variable_names.py:19
+msgid "روز کلاس"
+msgstr "class day"
+
+#: EduTerm/variable_names.py:20
+msgid "زمان کلاس"
+msgstr "class time"
+
+#: EduTerm/variable_names.py:21
+msgid "تاریخ امتحان"
+msgstr "exam date"
+
+#: EduTerm/variable_names.py:22
+msgid "مکان امتحان"
+msgstr "exam place"
+
+#: EduTerm/variable_names.py:23
+msgid "استاد"
+msgstr "teacher"
+
+#: EduTerm/variable_names.py:24
+msgid "ظرفیت"
+msgstr "capacity"
+
+#: Identity/variable_names.py:4
+msgid "عکس پروفایل"
+msgstr "protract"
+
+#: Identity/variable_names.py:5
+msgid "شماره موبایل"
+msgstr "mobile"
+
+#: Identity/variable_names.py:6
+msgid "جنسیت"
+msgstr "gender"
+
+#: Identity/variable_names.py:7
+msgid "تاریخ تولد"
+msgstr "birth date"
+
+#: Identity/variable_names.py:8
+msgid "کد ملی"
+msgstr "national code"
+
+#: Identity/variable_names.py:9
+msgid "وضعیت نظام وظیفه"
+msgstr "military service"
+
+#: Identity/variable_names.py:10
+msgid "دانشکده"
+msgstr "college"
+
+#: Identity/variable_names.py:11
+msgid "رشته تحصیلی"
+msgstr "education field"
+
+#: Identity/variable_names.py:12
+msgid "مدیر آی است"
+msgstr "is it manager"
+
+#: Identity/variable_names.py:13
+msgid "معاون آموزشی است"
+msgstr "is chancellor"
+
+#: Identity/variable_names.py:14
+msgid "دانشجو است"
+msgstr "is student"
+
+#: Identity/variable_names.py:15
+msgid "استاد است"
+msgstr "is teacher"
+
+#: Identity/variable_names.py:18 Identity/variable_names.py:27
+msgid "کاربر"
+msgstr "user"
+
+#: Identity/variable_names.py:19
+msgid "سال ورود"
+msgstr "entry year"
+
+#: Identity/variable_names.py:20
+msgid "ترم ورودی"
+msgstr "entry term"
+
+#: Identity/variable_names.py:21
+msgid "میانگین معدل"
+msgstr "average"
+
+#: Identity/variable_names.py:22
+msgid "سنوات"
+msgstr "academic year"
+
+#: Identity/variable_names.py:23
+msgid "ترم جاری"
+msgstr "current term"
+
+#: Identity/variable_names.py:28
+msgid "سطح"
+msgstr "level"
+
+#: Identity/variable_names.py:29
+msgid "تخصص"
+msgstr "expert"
+
+#: Identity/variable_names.py:32
+msgid "بله"
+msgstr "yes"
+
+#: Identity/variable_names.py:33
+msgid "نه"
+msgstr "No"
+
+#: Identity/variable_names.py:34
+msgid "مرد"
+msgstr "man"
+
+#: Identity/variable_names.py:35
+msgid "زن"
+msgstr "woman"
+
+#: Identity/variable_names.py:36
+msgid "کارت پایان خدمت"
+msgstr "end of service card"
+
+#: Identity/variable_names.py:37
+msgid "معافیت پزشکی"
+msgstr "medical exemption"
+
+#: Identity/variable_names.py:38
+msgid "معافیت غیرپزشکی"
+msgstr "non medical exemption"
+
+#: Identity/variable_names.py:39
+msgid "معافیت تحصیلی"
+msgstr "educational exemption"
+
+#: Identity/variable_names.py:40
+msgid "در حال خدمت"
+msgstr "currently in service"
+
+#: Identity/variable_names.py:41
+msgid "تعیین نشده"
+msgstr "not specified"
