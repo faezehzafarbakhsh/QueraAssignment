@@ -10,6 +10,7 @@ TERM_MODIFY_END_DATETIME = _('تاریخ پایان حذف و اضافه')
 TERM_EMERGENCY_COURSE_DROP_END_DATETIME = _('زمان حذف اضطراری')
 TERM_EXAM_START_DATE = _(' تاریخ شروع امتحان‌ها')
 TERM_TERM_END_DATE = _('پایان ترم')
+TERM_ACTIVE_TERM = _('ترم فعال جاری')
 
 
 # CourseTerm

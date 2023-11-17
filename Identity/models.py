@@ -85,7 +85,7 @@ class Student(models.Model):
                                 related_name="students", limit_choices_to=Q(is_student=True))
     entry_year = jmodels.jDateField(
         verbose_name=vn_identity.STUDENT_ENTRY_YEAR)
-    entry_term = models.IntegerField(                                    
+    entry_term = models.IntegerField(
         choices=EntryChoices.choices, verbose_name=vn_identity.STUDENT_ENTRY_TERM)
     current_term = models.ForeignKey("EduTerm.Term", on_delete=models.PROTECT,
                                      verbose_name=vn_identity.STUDENT_CURRENT_TERM, related_name="students")
@@ -109,3 +109,5 @@ class Teacher(models.Model):
         verbose_name=vn_identity.TEACHER_EXPERT, max_length=64)
 
     objects = TeacherManager()
+
+

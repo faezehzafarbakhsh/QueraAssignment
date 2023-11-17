@@ -26,6 +26,7 @@ class Term(models.Model):
         verbose_name=vn_edu_term.TERM_EMERGENCY_COURSE_DROP_END_DATETIME)
     exam_start_date = jmodels.jDateField(verbose_name=vn_edu_term.TERM_EXAM_START_DATE)
     term_end_date = jmodels.jDateField(verbose_name=vn_edu_term.TERM_TERM_END_DATE)
+    active_term = models.BooleanField(default=False, verbose_name=vn_edu_term.TERM_ACTIVE_TERM)
 
     objects = TermManager()
 
