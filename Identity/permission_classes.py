@@ -27,8 +27,16 @@ class IsTeacher(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.is_teacher
 
-
 class IsChancellor(BasePermission):
+    """
+    Custom permission to check if the user is an Teacher.
+    """
+
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.is_chancellor
+    
+
+class IsChancellorInSameCollege(BasePermission):
     """
     Custom permission to restrict access based on user roles and course college.
 

@@ -249,15 +249,6 @@ class ChangePasswordActionView(generics.CreateAPIView):
     http_method_names = ['post', 'get']
     permission_classes = (AllowAny,)
 
-    # def get_serializer_context(self):
-    #     context = super().get_serializer_context()
-    #     user = self.request.user
-    #     extra_context = {
-    #         "stored_token_for_user": custom_classes.CacheManager.get_cache_token(user)
-    #     }
-    #     context.update(extra_context)
-    #     return context
-
     def perform_create(self,  serializer):
         """
         Changes the user's password based on the provided token.
