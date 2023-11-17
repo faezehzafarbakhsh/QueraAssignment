@@ -9,7 +9,7 @@ ENROLLMENT_STUDENT = _("دانشجو")
 ENROLLMENT_TEACHER_ASISTANT = _("استاد راهنما")
 ENROLLMENT_STATUS = _("وضعیت")
 ENROLLMENT_TEACHER_ASISTANT_DESCRIPTION = _("توضیحات استاد راهنما")
-ENROLLMENT_TAKEN_TERM_NUMBER = _("توکن ترم")
+ENROLLMENT_TAKEN_TERM_NUMBER = _("تعداد ترم گذرانده")
 
 # StudentCourse
 STUDENT_COURSE_ENROLLED = _("ثبت نام کرده")

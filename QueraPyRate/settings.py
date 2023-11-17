@@ -49,6 +49,7 @@ DJANGO_APPS = [
 OTHER_APPS = [
     "rest_framework",
     'rest_framework_simplejwt',
+    'drf_yasg',
 
 ]
 
@@ -164,3 +165,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
 }
+
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, "locale"),
+)
