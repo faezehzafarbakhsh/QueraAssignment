@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny , IsAuthenticated
 from EduTerm import serializers as edu_term_serializers
 from EduTerm import models as edu_term_models
+from Identity import permission_classes
 # Create your views here.
 
 
@@ -10,13 +11,13 @@ class TermListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_term_serializers.TermSerializer
     queryset =edu_term_models.Term.objects.all()
     http_method_names = [ 'get','post', ]
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated, permission_classes.IsItManager)
     
 class TermRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = edu_term_serializers.TermSerializer
     queryset = edu_term_models.Term.objects.all()
     http_method_names = ['get', 'put', 'delete',]
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated, permission_classes.IsItManager)
 
 
 class CoursetermFieldListCreateView(generics.ListCreateAPIView):

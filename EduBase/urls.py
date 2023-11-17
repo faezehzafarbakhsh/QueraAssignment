@@ -1,4 +1,5 @@
 from django.urls import path
+from EduBase import views as edu_base_views
 
 urlpatterns = [
     path('admin/college/', edu_base_views.CollegeListCreateView.as_view(), name='college_list_create_view'),
