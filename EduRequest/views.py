@@ -46,7 +46,7 @@ class EnrollmentCertificateListView():
 class EnrollmentCertificateListCreateView(generics.ListAPIView):
     serializer_class = edu_request_serializers.EnrollmentCertificateSerializer
     queryset = edu_request_models.EnrollmentCertificate.objects.all()
-    http_method_names = ['get' , 'post']
+    http_method_names = ['post']
     permission_classes = (AllowAny,)
     
 class EnrollmentCertificateRetrieveUpdateDestroyView(generics.RetrieveDestroyAPIView):
@@ -59,7 +59,7 @@ class EnrollmentCertificateRetrieveUpdateDestroyView(generics.RetrieveDestroyAPI
 class AppealAgainstCourseCreateView(generics.CreateAPIView):
     serializer_class = edu_request_serializers.StudentRequestSerializer
     queryset = edu_request_models.StudentRequest.objects.filter(request_type = 4)
-    http_method_names = ['get','post']
+    http_method_names = ['post']
     permission_classes = (AllowAny,)
         
     def get_serializer_context(self):
@@ -88,7 +88,7 @@ class  AppealAgainstCourseListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_request_serializers.StudentRequestSerializer
     queryset = edu_request_models.StudentRequest.objects.filter(request_type = 4)
 
-    http_method_names = ['get']
+    http_method_names = ['get', 'post']
     permission_classes = (AllowAny,)
 
     def get_serializer_context(self):
@@ -148,7 +148,7 @@ class  Delete_Student_SemesterListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_request_serializers.StudentRequestSerializer
     queryset = edu_request_models.StudentRequest.objects.filter(request_type = 5)
 
-    http_method_names = ['get']
+    http_method_names = ['get', 'post']
     permission_classes = (AllowAny,)
 
     def get_serializer_context(self):
@@ -209,7 +209,7 @@ class StudentEmergencyRemovalListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_request_serializers.StudentRequestSerializer
     queryset = edu_request_models.StudentRequest.objects.filter(request_type = 6)
 
-    http_method_names = ['get']
+    http_method_names = ['get', 'post']
     permission_classes = (AllowAny,)
 
     def get_serializer_context(self):
