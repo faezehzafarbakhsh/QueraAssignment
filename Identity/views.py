@@ -9,7 +9,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from Identity import models as identity_models
 from Identity import serializers as identity_serializers
-from Identity import permisson_classes as custom_permissions
+from Identity import permission_classes as custom_permissions
 from Identity import custom_classes
 
 User = get_user_model()
