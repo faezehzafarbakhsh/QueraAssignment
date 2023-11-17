@@ -1,92 +1,448 @@
-from .models import User , Teacher
-from rest_framework import generics
-from .identity_serializers import TeacherSerializer
+from rest_framework import generics, status
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from django.contrib.auth import get_user_model
+from django.contrib.auth import logout
+from rest_framework_simplejwt.tokens import AccessToken
+
+from Identity import models as identity_models
+from Identity import serializers as identity_serializers
+from Identity import permission_classes as custom_permissions
+from Identity import custom_classes
+
+User = get_user_model()
+
+# Authentication Views
 
 
-# Create your views here.
+class UserRegisterIView(generics.CreateAPIView):
+    """
+    View for user registration.
 
+    Attributes:
+        serializer_class: The serializer class for handling user registration data.
+        queryset: The queryset of User objects (not used in this view).
+        http_method_names: The allowed HTTP methods (POST).
+        permission_classes: The permission classes (AllowAny).
 
-# User Authentication Views
-class UserAuthenticationView:
-    pass
+    Methods:
+        create: Validates and processes the user registration data, returning a JSON response with the access token.
 
+    Returns:
+        Response: JSON response containing the access token upon successful user registration.
 
-class UserChangePasswordView:
-    pass
+    Raises:
+        None
+    """
+    serializer_class = identity_serializers.RegisterSerializer
+    queryset = User.objects.all()
+    http_method_names = ['post']
+    permission_classes = (AllowAny,)
 
-# Teacher Management Views
+    def create(self, request, *args, **kwargs):
+        """
+        Validates and processes the user registration data, returning a JSON response with the access token.
 
+        Args:
+            request: The HTTP request object.
+            args: Additional arguments.
+            kwargs: Additional keyword arguments.
 
-class TeacherListCreateApiView(generics.ListCreateAPIView):
-    serializer_class = TeacherSerializer
-    queryset = Teacher.objects.all()
+        Returns:
+            Response: JSON response containing the access token upon successful user registration.
 
-    def post(self, request, *args, **kwargs):
+        Raises:
+            None
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        teacher = serializer.save()
-        return Response({
-            "teacher": TeacherSerializer(teacher).data
-        })
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-class TeacherRetrieveOrRetrieveOrUpdateOrDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Teacher.objects.all()
-    serializer_class = TeacherSerializer
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+class UserTokenLoginView(generics.CreateAPIView):
+    """
+    View for user login using JWT token.
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data)
+    Attributes:
+        serializer_class: The serializer class for handling user login with JWT token.
+        queryset: The queryset of User objects (not used in this view).
+        http_method_names: The allowed HTTP methods (POST).
+        permission_classes: The permission classes (AllowAny).
+
+    Methods:
+        get_serializer_context: Retrieves the context for the serializer.
+        perform_create: Validates and processes the user login data.
+        post: Handles the POST request and returns a JSON response upon successful user login.
+
+    Returns:
+        Response: JSON response with a success message upon successful user login.
+
+    Raises:
+        None
+    """
+    serializer_class = identity_serializers.UserTokenLoginSerializer
+    queryset = User.objects.all()
+    http_method_names = ['post']
+    permission_classes = (AllowAny,)
+
+    def get_serializer_context(self):
+        """
+        Retrieves the context for the serializer.
+
+        Returns:
+            dict: The context for the serializer.
+
+        Raises:
+            None
+        """
+        context = super().get_serializer_context()
+        return context
+
+    def perform_create(self, serializer):
+        """
+        Validates and processes the user login data.
+
+        Args:
+            serializer: The serializer instance.
+
+        Returns:
+            Response: JSON response with a success message upon successful user login.
+
+        Raises:
+            None
+        """
+        context = self.get_serializer_context()
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({'message': 'Teacher updated successfully.'})
+        user = serializer.validated_data['user']
+        return super().perform_create(serializer)
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
+    def post(self, request, *args, **kwargs):
+        """
+        Handles the POST request and returns a JSON response upon successful user login.
+
+        Args:
+            request: The HTTP request object.
+            args: Additional arguments.
+            kwargs: Additional keyword arguments.
+
+        Returns:
+            Response: JSON response with a success message upon successful user login.
+
+        Raises:
+            None
+        """
+        return Response({"message": "کاربر با موفقیت وارد سایت شد."}, status=status.HTTP_200_OK)
+
+
+class UserLogoutView(APIView):
+    """
+    View for user logout.
+
+    Attributes:
+        queryset: The queryset of User objects (not used in this view).
+        permission_classes: The permission classes (IsAuthenticated).
+
+    Methods:
+        get: Handles the GET request to log the user out.
+
+    Returns:
+        Response: JSON response with a success message upon successful user logout.
+
+    Raises:
+        None
+    """
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        """
+        Handles the GET request to log the user out.
+
+        Args:
+            request: The HTTP request object.
+            args: Additional arguments.
+            kwargs: Additional keyword arguments.
+
+        Returns:
+            Response: JSON response with a success message upon successful user logout.
+
+        Raises:
+            None
+        """
+        logout(request)
+        return Response({'message': 'یوزر با موفقیت از سایت خارج شد.'}, status=status.HTTP_200_OK)
+
+
+class ChangePasswordRequestView(generics.GenericAPIView):
+    """
+    View for initiating a request to change the user's password.
+
+    Attributes:
+        serializer_class: The serializer class for handling the input data.
+        queryset: The queryset of User objects (not used in this view).
+        http_method_names: The allowed HTTP methods (POST).
+        permission_classes: The permission classes (IsAuthenticated).
+
+    Methods:
+        post: Creates a one-time token for password change, stores it in cache, and sends it to the user.
+
+    Raises:
+        None
+    """
+    serializer_class = identity_serializers.ChangePasswordRequestSerializer
+    queryset = User.objects.all()
+    http_method_names = ['post']
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Creates a one-time token for password change, stores it in cache, and sends it to the user.
+
+        Args:
+            request: The HTTP request object.
+            args: Additional arguments.
+            kwargs: Additional keyword arguments.
+
+        Returns:
+            Response: JSON response with a success message and the one-time token.
+
+        Raises:
+            None
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        username = serializer.validated_data['username']
+        user = User.objects.get(username=username)
+
+        cached_token = custom_classes.CacheManager().set_cache_token(user)
+
+        return Response(
+            {'message': 'توکن یکبار مصرف برای تغییر رمز ارسال شد.',
+             'change_password_token': str(cached_token)},
+            status=status.HTTP_200_OK
+        )
+
+
+class ChangePasswordActionView(generics.CreateAPIView):
+    """
+    View for changing the user's password based on a provided token.
+
+    Attributes:
+        serializer_class: The serializer class for handling the input data.
+        queryset: The queryset of User objects (not used in this view).
+        http_method_names: The allowed HTTP methods (POST and GET).
+        permission_classes: The permission classes (AllowAny).
+
+    Methods:
+        perform_create: Changes the user's password based on the provided token.
+
+    Raises:
+        None
+    """
+    serializer_class = identity_serializers.ChangePasswordActionSerializer
+    queryset = User.objects.all()
+    http_method_names = ['post', 'get']
+    permission_classes = (AllowAny,)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        user = self.request.user
+        extra_context = {
+            "stored_token_for_user": custom_classes.CacheManager.get_cache_token(user)
+        }
+        context.update(extra_context)
+        return context
+
+    def perform_create(self, serializer):
+        """
+        Changes the user's password based on the provided token.
+
+        Args:
+            serializer: The serializer instance.
+
+        Returns:
+            None
+        """
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+    def post(self, request, *args, **kwargs):
+        """
+        Changes the user's password based on the provided token.
+
+        Args:
+            request: The HTTP request object.
+            args: Additional arguments.
+            kwargs: Additional keyword arguments.
+
+        Returns:
+            Response: JSON response with a success message.
+
+        Raises:
+            None
+        """
+        serializer = self.get_serializer(data=request.data)
+        self.perform_create(serializer)
+
+        custom_classes.CacheManager.delete_cache_token(request.user)
+
+        return Response(
+            {'message': 'رمز عبور با موفقیت تغییر یافت.'},
+            status=status.HTTP_200_OK
+        )
+
+
+# It Manger Views
+
+
+class ItTeacherListCreateView(generics.ListCreateAPIView):
+    """
+    View for listing and creating IT teachers.
+
+    Attributes:
+        serializer_class: The serializer class for handling IT teacher data.
+        queryset: The queryset of User objects.
+        http_method_names: The allowed HTTP methods (POST and GET).
+        permission_classes: The permission classes (IsAuthenticated, IsItManager).
+
+    Methods:
+        get_queryset: Retrieves the queryset of IT teachers.
+
+    Raises:
+        None
+    """
+    serializer_class = identity_serializers.ItTeacherSerializer
+    queryset = User.objects.all()
+    http_method_names = ['post', 'get']
+    permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
+
+    def get_queryset(self):
+        return User.objects.filter(is_teacher=True)
+
+
+class ItTeacherRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    View for retrieving, updating, and destroying an IT teacher.
+
+    Attributes:
+        serializer_class: The serializer class for handling IT teacher data.
+        queryset: The queryset of User objects.
+        permission_classes: The permission classes (IsAuthenticated, IsItManager).
+
+    Methods:
+        perform_destroy: Deletes the IT teacher and the corresponding User instance.
+
+    Raises:
+        None
+    """
+    serializer_class = identity_serializers.ItTeacherSerializer
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
+
+    def perform_destroy(self, instance):
+        teacher_instance = instance.teachers
+        teacher_instance.delete()
         instance.delete()
-        return Response({'message': 'Teacher deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+        return Response({'message': 'User and Teacher instances deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
 
 
-# Student Management Views
-class StudentListOrCreateView:
-    pass
+class ItStudentListCreateView(generics.ListCreateAPIView):
+    """
+    View for listing and creating IT students.
+
+    Attributes:
+        serializer_class: The serializer class for handling IT student data.
+        queryset: The queryset of User objects.
+        http_method_names: The allowed HTTP methods (POST and GET).
+        permission_classes: The permission classes (IsAuthenticated, IsItManager).
+
+    Methods:
+        get_queryset: Returns the queryset of IT students.
+
+    Raises:
+        None
+    """
+    serializer_class = identity_serializers.ItStudentSerializer
+    queryset = User.objects.all()
+    http_method_names = ['post', 'get']
+    permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
+
+    def get_queryset(self):
+        return User.objects.filter(is_student=True)
 
 
-class StudentRetrieveOrUpdateOrDestroyView:
-    pass
+class ItStudentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    View for retrieving, updating, and destroying an IT student.
 
-# Chancellor Management Views
+    Attributes:
+        serializer_class: The serializer class for handling IT student data.
+        queryset: The queryset of User objects.
+        permission_classes: The permission classes (IsAuthenticated, IsItManager).
 
+    Methods:
+        None
 
-class ChancellorListOrCreateView:
-    pass
+    Raises:
+        None"""
+    serializer_class = identity_serializers.ItStudentSerializer
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
 
+    def perform_destroy(self, instance):
+        student_instance = instance.students
+        student_instance.delete()
+        instance.delete()
 
-class ChancellorRetrieveOrUpdateOrDestroyView:
-    pass
-
-# College Management Views
-
-
-class CollegeListOrCreateView:
-    pass
-
-
-class CollegeRetrieveOrUpdateOrDestroyView:
-    pass
-
-# Term Management Views
-
-
-class TermListOrCreateView:
-    pass
+        return Response({'message': 'User and student instances deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
 
 
-class TermRetrieveOrUpdateOrDestroyView:
-    pass
+class ItChancellorListCreateView(generics.ListCreateAPIView):
+    """
+    View for listing and creating IT chancellors.
+
+    Attributes:
+        serializer_class: The serializer class for handling IT chancellor data.
+        queryset: The queryset of User objects.
+        http_method_names: The allowed HTTP methods (POST and GET).
+        permission_classes: The permission classes (IsAuthenticated, IsItManager).
+
+    Methods:
+        get_queryset: Returns the queryset of IT chancellors.
+
+    Raises:
+        None
+    """
+    serializer_class = identity_serializers.ItChancellorSerializer
+    queryset = User.objects.all()
+    http_method_names = ['post', 'get']
+    permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
+
+    def get_queryset(self):
+        return User.objects.filter(is_chancellor=True)
+
+
+class ItChancellorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    View for retrieving, updating, and deleting IT chancellors.
+
+    Attributes:
+        serializer_class: The serializer class for handling IT chancellor data.
+        queryset: The queryset of User objects.
+        permission_classes: The permission classes (IsAuthenticated, IsItManager).
+
+    Methods:
+        perform_destroy: Deletes the IT chancellor instance.
+
+    Raises:
+        None
+    """
+    serializer_class = identity_serializers.ItChancellorSerializer
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated, custom_permissions.IsItManager)

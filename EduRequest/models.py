@@ -29,7 +29,7 @@ class StudentRequest(models.Model):
                                 verbose_name=vn_edu_request.STUDENT_REQUEST_STUDENT,
                                 related_name='student_requests')
     term = models.ForeignKey('EduTerm.Term', on_delete=models.PROTECT, verbose_name=vn_edu_request.STUDENT_REQUEST_TERM,
-                             related_name='student_requests')
+                            related_name='student_requests')
     course_term = models.ForeignKey('EduTerm.CourseTerm', on_delete=models.PROTECT,
                                     verbose_name=vn_edu_request.STUDENT_REQUEST_COURSE_TERM,
                                     related_name='student_requests')
@@ -43,7 +43,7 @@ class StudentRequest(models.Model):
                                     limit_choices_to=Q(is_teacher=True) | Q(is_chancellor=True),
                                     related_name='student_request_answers', null=True, blank=True)
     request_type = models.IntegerField(choices=RequestTypeChoices.choices,
-                                       verbose_name=vn_edu_request.STUDENT_REQUEST_REQUEST_TYPE)
+                                    verbose_name=vn_edu_request.STUDENT_REQUEST_REQUEST_TYPE)
 
     objects = StudentRequestManager()
 
