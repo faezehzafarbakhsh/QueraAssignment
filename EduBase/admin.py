@@ -1,9 +1,10 @@
 from django.contrib import admin
+from django.http.request import HttpRequest
 from . import models
 from .models import Course, CourseRelation
 from django.urls import reverse, NoReverseMatch
 from django.utils.html import format_html
-
+from EduBase import admin_panel_permissions
 # Register your models here.
 
 # EduField
@@ -22,6 +23,9 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ('name', 'college', 'unit_count', 'course_type')
     list_filter = ('name', 'college', 'unit_count', 'course_type')
     search_fields = ('name', 'college', 'unit_count', 'course_type')
+    
+    def has_add_permission(self, request):
+        return admin_panel_permissions.BaseChancellorPermission.has_add_permission(request)
 
 
 # CourseRelation
