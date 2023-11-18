@@ -14,12 +14,11 @@ class UserAdmin(admin.ModelAdmin):
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('user', 'entry_year', 'entry_term', 'current_term', 'average', 'academic_year')
     list_filter = ('user', 'entry_year', 'entry_term', 'current_term', 'average', 'academic_year')
-    search_fields = ('user', 'entry_year', 'entry_term', 'current_term', 'average', 'academic_year')
-    # search_fields = ('user__username', 'user__first_name', 'user__last_name')
+    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'user__ national_code', 'entry_year', 'entry_term', 'current_term', 'average', 'academic_year')
+
 
 @admin.register(models.Teacher)
 class TeacherAdmin(admin.ModelAdmin):
     list_display = ('user', 'level', 'expert')
     list_filter = ('user', 'level', 'expert')
-    search_fields = ('user', 'level', 'expert')
-    # search_fields = ('user__username', 'user__first_name', 'user__last_name', 'level', 'expert')
+    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'user__ national_code', 'level', 'expert')
