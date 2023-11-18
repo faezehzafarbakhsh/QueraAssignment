@@ -431,7 +431,7 @@ class ChancellorStudentsListView(generics.ListAPIView):
 
     def get_queryset(self):
         if self.request.user.is_chancellor:
-            college = self.request.user.college if self.request.user.is_chancellor else None
+            college = self.request.user.college 
 
             if college:
                 queryset = User.objects.filter(
@@ -453,7 +453,7 @@ class ChancellorStudentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyA
 
     def get_queryset(self):
         if self.request.user.is_chancellor:
-            college = self.request.user.college if self.request.user.is_chancellor else None
+            college = self.request.user.college 
 
             if college:
                 queryset = User.objects.filter(
