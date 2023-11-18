@@ -1,7 +1,9 @@
 from django.http import Http404
 from django.shortcuts import render , get_object_or_404
-from rest_framework import generics
+from rest_framework import generics , status
 from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from EduRequest import serializers as edu_request_serializers
 from EduRequest import models as edu_request_models
@@ -55,7 +57,7 @@ class EnrollmentCertificateRetrieveUpdateDestroyView(generics.RetrieveDestroyAPI
     http_method_names = ['get' , 'put' , 'delete']
     permission_classes = (AllowAny,)
     
-
+# student
 class AppealAgainstCourseCreateView(generics.CreateAPIView):
     serializer_class = edu_request_serializers.StudentRequestSerializer
     queryset = edu_request_models.StudentRequest.objects.filter(request_type = 4)
@@ -113,7 +115,38 @@ class  AppealAgainstCourseListCreateView(generics.ListCreateAPIView):
         serializer.validated_data['course_term'] = context.get('course_term')
         serializer.validated_data['request_type'] = context.get('request_type')
         return super().perform_create(serializer)
-    
+   
+# teacher 
+class AppealAgainstCoursePutView(generics.RetrieveUpdateAPIView):
+    serializer_class = edu_request_serializers.TeacherAnswerSerializer
+    queryset = edu_request_models.StudentRequest.objects.filter(request_type=4)
+    permission_classes = (IsAuthenticated,)
+    def update(self, request, *args, **kwargs):
+        partial= kwargs.pop('partial',False)
+        instance= self.get_object()
+
+        if not self.check_permissions(instance):
+            return Response({'detail': 'You do not have permission to update this request.'}, status=status.HTTP_403_FORBIDDEN)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial) 
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data)
+        
+        
+    def check_permissions(self, instance):
+         return self.request.user.is_chancellor == False
+    def perform_update(self, serializer):
+        # ثبت پاسخ معاون آموزشی
+        serializer.save(answer=self.request.data.get('answer'), status=self.request.data.get('status'))
+
+        
+class AppealAgainstCourseListView(generics.CreateAPIView):
+    serializer_class = edu_request_serializers.TeacherAnswerSerializer
+    queryset = edu_request_models.StudentRequest.objects.all()
+    http_method_names = ['get']
+    permission_classes = (AllowAny,)
+
+
+
 
 class Delete_Student_SemesterCreateView(generics.CreateAPIView):
     serializer_class = edu_request_serializers.StudentRequestSerializer

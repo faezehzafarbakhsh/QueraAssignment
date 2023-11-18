@@ -12,4 +12,6 @@ urlpatterns = [
     path('student/<int:pk>/course_term/<int:course_term_pk>/remove-term/', edu_request_views.Delete_Student_SemesterListCreateView.as_view(), name='appel_against_course_list_create_view'),
     path('student/me/course_term/<int:course_term_pk>/emergency-remove/', edu_request_views.Delete_Student_SemesterListCreateView.as_view(), name='appel_against_course_list_create_view'),
     path('student/<int:pk>/course_term/<int:course_term_pk>/emergency-remove/', edu_request_views.Delete_Student_SemesterListCreateView.as_view(), name='appel_against_course_list_create_view'),
+    path('admin/appeal_request/<int:pk>/',edu_request_views.AppealAgainstCoursePutView.as_view(),),
+    path('admin/appeal_request/',edu_request_views.AppealAgainstCourseListView.as_view(),),
 ]

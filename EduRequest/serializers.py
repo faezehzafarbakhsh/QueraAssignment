@@ -13,6 +13,13 @@ class EnrollmentCertificateSerializer(serializers.ModelSerializer):
     fields = ['student' , 'term' , 'enrollment_certificate_place',]
     
 
+class TeacherAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = edu_request_models.StudentRequest
+        fields = ['status', 'request_description', 'answer']
+
+
+
 
 
 
