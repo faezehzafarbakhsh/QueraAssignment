@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from rest_framework import generics
-from rest_framework.permissions import AllowAny , IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from EduBase import serializers as edu_base_serializers
 from EduBase import models as edu_base_models
 from Identity import permission_classes
+
 
 class EduFieldListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_base_serializers.EduFieldSerializer
@@ -23,14 +24,29 @@ class CourseListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_base_serializers.CourseSerializer
     queryset = edu_base_models.Course.objects.all()
     http_method_names = ['get', 'post']
-    permission_classes = (AllowAny,)
+    permission_classes = (
+        IsAuthenticated, permission_classes.IsItManager | permission_classes.IsChancellor)
 
 
 class CourseRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = edu_base_serializers.CourseSerializer
-    queryset = edu_base_models.Course.objects.all()
     http_method_names = ['get', 'put', 'delete']
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated, permission_classes.IsItManager |
+                          permission_classes.IsChancellor)
+
+    def get_queryset(self):
+        if self.request.user.is_chancellor:
+            college = self.request.user.college 
+
+            if college:
+                queryset = edu_base_models.Course.objects.filter(
+                    college=college)
+            else:
+                queryset = edu_base_models.Course.objects.none()
+        else:
+            queryset = edu_base_models.Course.objects.all()
+
+        return queryset
 
 
 class CourseRelationListCreateView(generics.ListCreateAPIView):

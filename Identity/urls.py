@@ -28,6 +28,10 @@ urlpatterns = [
     path('admin/assistants/', identity_views.ItChancellorListCreateView.as_view()),
     path('admin/assistants/<int:pk>/',
          identity_views.ItChancellorRetrieveUpdateDestroyView.as_view()),
+    
+    path('students/', identity_views.ChancellorStudentsListView.as_view()),
+    path('students/<int:pk>/',
+         identity_views.ChancellorStudentRetrieveUpdateDestroyView.as_view()),
 
 
 
