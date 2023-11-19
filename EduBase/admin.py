@@ -8,6 +8,8 @@ from EduBase import admin_panel_permissions
 # Register your models here.
 
 # EduField
+
+
 @admin.register(models.EduField)
 class EduFieldAdmin(admin.ModelAdmin):
     list_display = ('name', 'edu_group', 'unit_count', 'edu_grade')
@@ -23,9 +25,12 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ('name', 'college', 'unit_count', 'course_type')
     list_filter = ('name', 'college', 'unit_count', 'course_type')
     search_fields = ('name', 'college', 'unit_count', 'course_type')
-    
+
+    def has_view_permission(self, request):
+        return admin_panel_permissions.AdminPanelChancellorPermission().has_view_permission(request)
+
     def has_add_permission(self, request):
-        return admin_panel_permissions.BaseChancellorPermission.has_add_permission(request)
+        return admin_panel_permissions.AdminPanelChancellorPermission().has_add_permission(request)
 
 
 # CourseRelation
