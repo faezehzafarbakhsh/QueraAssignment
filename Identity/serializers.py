@@ -10,6 +10,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.contrib.auth.models import Group
 
 from Identity import models as identity_models
 from EduTerm import models as ed_term_models
@@ -287,7 +288,7 @@ class ItTeacherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = identity_models.User
-        fields = ['username', 'email', 'gender','college',
+        fields = ['username', 'email', 'gender', 'college',
                   'mobile', 'national_code', 'expert', 'level']
 
     def create(self, validated_data):
@@ -364,7 +365,7 @@ class ItStudentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = identity_models.User
-        fields = ['username', 'email', 'gender','college', 
+        fields = ['username', 'email', 'gender', 'college',
                   'mobile', 'national_code', 'entry_year', 'edu_field', 'entry_term', 'current_term', 'average', 'academic_year']
 
     def create(self, validated_data):
@@ -439,10 +440,13 @@ class ItChancellorSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data['is_chancellor'] = True
+        validated_data['is_staff'] = True
 
         validated_data['password'] = custom_classes.GlobalFunction.make_random_password()
 
         print(validated_data['password'])
+        chancellor_group = Group.objects.get(name='chancellor')
+        user_instance.groups.add(chancellor_group)
         # send password as a email to user
 
         user_instance = User.objects.create_user(**validated_data)

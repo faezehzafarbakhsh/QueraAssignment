@@ -1,4 +1,6 @@
+from typing import Any
 from django.contrib import admin
+from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 from . import models
 from .models import Course, CourseRelation
@@ -26,11 +28,13 @@ class CourseAdmin(admin.ModelAdmin):
     list_filter = ('name', 'college', 'unit_count', 'course_type')
     search_fields = ('name', 'college', 'unit_count', 'course_type')
 
-    def has_view_permission(self, request):
-        return admin_panel_permissions.AdminPanelChancellorPermission().has_view_permission(request)
-
-    def has_add_permission(self, request):
-        return admin_panel_permissions.AdminPanelChancellorPermission().has_add_permission(request)
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
+        qs = super().get_queryset(request)
+        user = request.user
+        chancellor_college = user.college
+        if user.is_chancellor:
+            qs = qs.filter(college=request.user.college)
+        return qs
 
 
 # CourseRelation
