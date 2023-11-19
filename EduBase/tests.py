@@ -15,6 +15,8 @@ class EduFieldTests(APITestCase):
         }
         self.edu_field = models.EduField.objects.create(**self.edu_field_data)
         self.edu_field_url = reverse('edu_field_list_create_view')
+        self.detail_url = reverse('edu_field_retrieve_update_destroy_view', args=[
+            self.edu_field.id])
 
     def test_create_edu_field(self):
         response = self.client.post(self.edu_field_url, self.edu_field_data)
@@ -29,29 +31,23 @@ class EduFieldTests(APITestCase):
         self.assertEqual(len(response.data), 1)
 
     def test_get_edu_field_detail(self):
-        detail_url = reverse('edu_field_retrieve_update_destroy_view', args=[
-                             self.edu_field.id])
-        response = self.client.get(detail_url)
+        response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['name'], self.edu_field_data['name'])
 
     def test_update_edu_field(self):
-        detail_url = reverse('edu_field_retrieve_update_destroy_view', args=[
-                             self.edu_field.id])
         updated_data = {
             'name': 'Updated Field Name',
             'edu_group': 'Updated Group',
             'unit_count': 4,
             'edu_grade': 3,  # Assuming 3 corresponds to 'MastersDegree' in your choices
         }
-        response = self.client.put(detail_url, updated_data)
+        response = self.client.put(self.detail_url, updated_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.edu_field.refresh_from_db()
         self.assertEqual(self.edu_field.name, updated_data['name'])
 
     def test_delete_edu_field(self):
-        detail_url = reverse('edu_field_retrieve_update_destroy_view', args=[
-                             self.edu_field.id])
-        response = self.client.delete(detail_url)
+        response = self.client.delete(self.detail_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(models.EduField.objects.count(), 0)
