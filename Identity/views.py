@@ -204,8 +204,7 @@ class ChangePasswordRequestView(generics.GenericAPIView):
         user = User.objects.get(username=username)
 
         cached_token = custom_classes.CacheManager().set_cache_token(user)
-        tasks.send_change_password_email.delay(user.email, str(cached_token))
-
+        email = tasks.send_change_password_email(user_email=user.email,token= str(cached_token))
         return Response(
             {'message': 'توکن یکبار مصرف برای تغییر رمز ارسال شد.',
              'change_password_token': str(cached_token)},

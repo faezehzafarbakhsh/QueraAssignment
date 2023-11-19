@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
+from . import settings
 
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'QueraPyRate.settings')
@@ -20,4 +21,4 @@ celery_app.conf.result_backend = 'redis://localhost:6379/0'
 celery_app.conf.result_backend = 'django-db'
 
 # Auto-discover tasks in all installed apps
-celery_app.autodiscover_tasks()
+celery_app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)

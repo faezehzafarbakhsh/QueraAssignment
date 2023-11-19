@@ -1,12 +1,29 @@
 # tasks.py
 from celery import shared_task
 from django.core.mail import send_mail
+from QueraPyRate import settings
+import logging
 
-@shared_task
+logger = logging.getLogger(__name__)
+
+
+@shared_task()
 def send_change_password_email(user_email, token):
-    subject = 'Change Password Token'
-    message = f'Your one-time token for changing the password is: {token}'
-    from_email = 'alisfryly075@gmail.com'  # Update with your email
-    recipient_list = [user_email]
-
-    send_mail(subject, message, from_email, recipient_list)
+    try:
+        logger.info(f"Sending email to {user_email}")
+        logger.info(f"Token: {token}")
+        mail_subject = "Change Password Token"
+        message = token
+        to_email = user_email
+        send_mail(
+            subject=mail_subject,
+            message=message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[to_email],
+            fail_silently=True,
+        )
+        return "Done"
+    except Exception as e:
+        # Log any exceptions for debugging
+        logger.exception(f"Error in send_change_password_email task{e}")
+        raise
