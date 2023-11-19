@@ -443,7 +443,7 @@ class ChancellorStudentsListView(generics.ListAPIView):
 
     def get_queryset(self):
         if self.request.user.is_chancellor:
-            college = self.request.user.college 
+            college = self.request.user.college
 
             if college:
                 queryset = User.objects.filter(
@@ -456,7 +456,6 @@ class ChancellorStudentsListView(generics.ListAPIView):
         return queryset
 
 
-
 class ChancellorStudentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
     serializer_class = identity_serializers.ChancellorStudentSerializer
@@ -465,11 +464,33 @@ class ChancellorStudentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyA
 
     def get_queryset(self):
         if self.request.user.is_chancellor:
-            college = self.request.user.college 
+            college = self.request.user.college
 
             if college:
                 queryset = User.objects.filter(
                     is_student=True, college=college)
+            else:
+                queryset = User.objects.none()
+        else:
+            queryset = User.objects.all()
+
+        return queryset
+
+
+class ChancellorTeacherListView(generics.ListAPIView):
+
+    serializer_class = identity_serializers.ChancellorTeacherSerializer
+    http_method_names = ['post', 'get']
+    permission_classes = (
+        IsAuthenticated, custom_permissions.IsItManager | custom_permissions.IsChancellor)
+
+    def get_queryset(self):
+        if self.request.user.is_chancellor:
+            college = self.request.user.college
+
+            if college:
+                queryset = User.objects.filter(
+                    is_teacher=True, college=college)
             else:
                 queryset = User.objects.none()
         else:
