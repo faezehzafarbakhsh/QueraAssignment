@@ -3,10 +3,6 @@ from django.contrib import admin
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 from . import models
-from .models import Course, CourseRelation
-from django.urls import reverse, NoReverseMatch
-from django.utils.html import format_html
-from EduBase import admin_panel_permissions
 # Register your models here.
 
 # EduField
@@ -33,7 +29,7 @@ class CourseAdmin(admin.ModelAdmin):
         user = request.user
         chancellor_college = user.college
         if user.is_chancellor:
-            qs = qs.filter(college=request.user.college)
+            qs = qs.filter(college=chancellor_college)
         return qs
 
 
