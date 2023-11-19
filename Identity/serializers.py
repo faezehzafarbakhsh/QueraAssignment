@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from django.core.validators import validate_email
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import login
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib.auth.password_validation import validate_password
@@ -16,9 +16,26 @@ from EduTerm import models as ed_term_models
 from Identity import variable_names as vn_identity
 from Identity import custom_classes
 
+from rest_framework_simplejwt.serializers import TokenObtainSerializer
+from rest_framework_simplejwt.tokens import AccessToken
+from typing import Any, Dict
+
 User = get_user_model()
 
 # Authentication Serializers
+
+
+class CustomTokenObtainPairSerializer(TokenObtainSerializer):
+    token_class = AccessToken
+
+    def validate(self, attrs: Dict[str, Any]):
+        data = super().validate(attrs)
+
+        access = self.get_token(self.user)
+
+        data["access"] = str(access)
+
+        return data
 
 
 class RegisterSerializer(serializers.ModelSerializer):

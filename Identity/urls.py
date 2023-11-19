@@ -33,6 +33,8 @@ urlpatterns = [
     path('students/<int:pk>/',
          identity_views.ChancellorStudentRetrieveUpdateDestroyView.as_view()),
 
+     # Token
+     path('token/', identity_views.CustomTokenObtainPairView.as_view(),)
 
 
 ]
