@@ -50,6 +50,7 @@ OTHER_APPS = [
     "rest_framework",
     'rest_framework_simplejwt',
     'drf_yasg',
+    'django_celery_results',
 
 ]
 
@@ -169,3 +170,30 @@ REST_FRAMEWORK = {
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, "locale"),
 )
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Tehran'
+
+EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
+#add your host of the email here in this case its Gmail so we are going to use Gmail host
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+#add the port number of the email server
+EMAIL_PORT = 587
+#add your gamil here
+EMAIL_HOST_USER = 'alysfryly075@gmail.com'
+#add your password here
+EMAIL_HOST_PASSWORD = 'a12014070'
+DEFAULT_FROM_EMAIL='Celery <alysfryly075@gmail.com>'
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://localhost:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
