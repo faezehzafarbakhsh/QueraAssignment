@@ -14,5 +14,4 @@ class TermAdmin(admin.ModelAdmin):
 class CourseTermAdmin(admin.ModelAdmin):
     list_display = ('course', 'term', 'class_day', 'class_time', 'exam_datetime', 'exam_place', 'teacher', 'capacity')
     list_filter = ('course', 'term', 'class_day', 'class_time', 'exam_datetime', 'exam_place', 'teacher', 'capacity')
-    search_fields = ('course', 'term', 'class_day', 'class_time', 'exam_datetime', 'exam_place', 'teacher', 'capacity')
-    # search_fields = ('course__name', 'term__name', 'teacher__username')
+    search_fields = ('course__name', 'term__name', 'teacher__username', 'class_day', 'class_time', 'exam_datetime', 'exam_place', 'capacity')
