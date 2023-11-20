@@ -5,7 +5,8 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
 from django.core.validators import validate_email
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login 
+from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib.auth.password_validation import validate_password
@@ -44,6 +45,33 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True, 'style': {'input_type': 'password'}},
         }
+
+    def validate(self, attrs):
+        """
+        Validates the password fields.
+
+        Args:
+            attrs (dict): The dictionary containing the serialized data.
+
+        Returns:
+            dict: The validated attributes.
+
+        Raises:
+            serializers.ValidationError: If the passwords do not match or do not meet the requirements.
+        """
+        password1 = attrs.get('password')
+        password2 = attrs.get('password2')
+
+        if password1 != password2:
+            raise serializers.ValidationError("گذرواژه ها مطابقت ندارند.")
+
+        # Use Django's password validation
+        try:
+            validate_password(password1, self.instance)
+        except serializers.ValidationError as e:
+            raise serializers.ValidationError(str(e))
+
+        return attrs
 
     def create(self, validated_data):
         """
@@ -270,7 +298,7 @@ class ItTeacherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = identity_models.User
-        fields = ['username', 'email', 'gender','college',
+        fields = ['username', 'email', 'gender', 'college',
                   'mobile', 'national_code', 'expert', 'level']
 
     def create(self, validated_data):
@@ -347,7 +375,7 @@ class ItStudentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = identity_models.User
-        fields = ['username', 'email', 'gender','college', 
+        fields = ['username', 'email', 'gender', 'college',
                   'mobile', 'national_code', 'entry_year', 'edu_field', 'entry_term', 'current_term', 'average', 'academic_year']
 
     def create(self, validated_data):

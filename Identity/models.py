@@ -65,6 +65,10 @@ class User(user_models.AbstractUser):
         default=False, verbose_name=vn_identity.USER_IS_TEACHER)
     military_service = models.IntegerField(choices=MilitaryChoices.choices, null=True, blank=True,
                                            verbose_name=vn_identity.USER_MILITARY_SERVICE, default=0)
+
+    class Meta:
+        unique_together = ('email', 'national_code')
+
     objects = UserManager()
 
 
@@ -109,5 +113,3 @@ class Teacher(models.Model):
         verbose_name=vn_identity.TEACHER_EXPERT, max_length=64)
 
     objects = TeacherManager()
-
-
