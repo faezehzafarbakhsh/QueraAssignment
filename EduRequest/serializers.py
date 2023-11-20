@@ -20,6 +20,10 @@ class TeacherAnswerSerializer(serializers.ModelSerializer):
         model = edu_request_models.StudentRequest
         fields = ['status', 'request_description', 'answer']
 
+class ChancellorRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = edu_request_models.StudentRequest
+        fields = ['request_type', 'student', 'term', 'course_term', 'request_description', 'answer', 'status', 'has_academic_year', 'user_answer',]
 
 # class  EDUTERM_CourseSerializer(serializers.ModelSerializer):
 #     class Meta:

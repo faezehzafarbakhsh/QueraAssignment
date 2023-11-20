@@ -12,7 +12,6 @@ from EduTerm import models as edu_term_models
 from django.contrib.auth import get_user_model
 from Identity import permission_classes
 
-
 class EnrollmentCertificateListCreateView(generics.ListAPIView):
     serializer_class = edu_request_serializers.EnrollmentCertificateSerializer
     queryset = edu_request_models.EnrollmentCertificate.objects.all()
@@ -32,7 +31,7 @@ class StudentRequestListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_request_serializers.StudentRequestSerializer
     http_method_names = ['get', 'post']
     permission_classes = (permission_classes.IsStudent,)
-
+    
     def get_queryset(self):
         return edu_request_models.StudentRequest.objects.filter(student=self.request.user)
 
@@ -108,9 +107,18 @@ class StudentRequestDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVie
     def perform_destroy(self, instance):
         instance.delete()
 
+
 # teacher
+class ChancellorRequestListView(generics.ListAPIView):
+    serializer_class = edu_request_serializers.ChancellorRequestSerializer
+    http_method_names = ['get']
+    permission_classes = (AllowAny,)
+    queryset = edu_request_models.StudentRequest.objects.all()
 
 
+
+
+# --------------------
 class AppealAgainstCoursePutView(generics.RetrieveUpdateAPIView):
     serializer_class = edu_request_serializers.TeacherAnswerSerializer
     queryset = edu_request_models.StudentRequest.objects.filter(request_type=4)
@@ -119,7 +127,6 @@ class AppealAgainstCoursePutView(generics.RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-
         serializer = self.get_serializer(
             instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
@@ -258,3 +265,24 @@ class StudentEmergencyRemovalListCreateView(generics.ListCreateAPIView):
         serializer.validated_data['course_term'] = context.get('course_term')
         serializer.validated_data['request_type'] = context.get('request_type')
         return super().perform_create(serializer)
+
+
+# class CoursetermRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+#     serializer_class = edu_term_serializers.CourseTermSerializer
+#     http_method_names = ['get', 'put', 'delete',]
+#     permission_classes = (IsAuthenticated, permission_classes.IsItManager |
+#                           permission_classes.IsChancellor)
+
+#     def get_queryset(self):
+#         if self.request.user.is_chancellor:
+#             college = self.request.user.college if self.request.user.is_chancellor else None
+
+#             if college:
+#                 queryset = edu_term_models.CourseTerm.objects.filter(
+#                     college=college)
+#             else:
+#                 queryset = edu_term_models.CourseTerm.objects.none()
+#         else:
+#             queryset = edu_term_models.CourseTerm.objects.all()
+
+#         return queryset
