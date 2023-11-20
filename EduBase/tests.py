@@ -28,7 +28,7 @@ class EduFieldTests(APITestCase):
         response = self.client.get(self.edu_field_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Assuming you have one existing object
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data['count'], 1)
 
     def test_get_edu_field_detail(self):
         response = self.client.get(self.detail_url)
