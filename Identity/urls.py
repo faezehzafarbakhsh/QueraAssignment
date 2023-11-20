@@ -4,14 +4,14 @@ from Identity import views as identity_views
 urlpatterns = [
     # Authentication
     path('users/register/', identity_views.UserRegisterIView.as_view(), name="user_register"),
-    path('users/login/', identity_views.UserTokenLoginView.as_view()),
+    path('users/login/', identity_views.UserTokenLoginView.as_view(), name ="user_token_login"),
     path('users/logout/', identity_views.UserLogoutView.as_view()),
 
     # Change Password
     path('users/change-password-request/',
-         identity_views.ChangePasswordRequestView.as_view()),
+         identity_views.ChangePasswordRequestView.as_view(), name="change_password_request"),
     path('users/change-password-action/',
-         identity_views.ChangePasswordActionView.as_view()),
+         identity_views.ChangePasswordActionView.as_view(), name="change_password_action"),
 
     # Users crud
 
