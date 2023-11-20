@@ -24,8 +24,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_filter = ('name', 'college', 'unit_count', 'course_type')
     search_fields = ('name', 'college', 'unit_count', 'course_type')
     
-    def has_add_permission(self, request):
-        return admin_panel_permissions.BaseChancellorPermission.has_add_permission(request)
+
 
 
 # CourseRelation
