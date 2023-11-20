@@ -16,4 +16,7 @@ urlpatterns = [
     path('student/me/course_term/<int:course_term_pk>/<int:request_type>/request/<int:pk>/',
         edu_request_views.StudentRequestDetailUpdateDestroyView.as_view(),
         name='student_request_detail_update_destroy_view'),
+    
+    # Teacher Answers 
+    path('professor/me/courses/<int:course_term_pk>/appeal-requests/<int:pk>/' , edu_request_views.TeacherAnswerStudentRequestSerializer.as_view())
 ]

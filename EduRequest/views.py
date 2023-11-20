@@ -28,6 +28,7 @@ class EnrollmentCertificateRetrieveUpdateDestroyView(generics.RetrieveDestroyAPI
 
 # student
 
+
 class StudentRequestListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_request_serializers.StudentRequestSerializer
     http_method_names = ['get', 'post']
@@ -111,57 +112,29 @@ class StudentRequestDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVie
 # teacher
 
 
-class AppealAgainstCoursePutView(generics.RetrieveUpdateAPIView):
+class TeacherAnswerStudentRequestSerializer(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = edu_request_serializers.TeacherAnswerSerializer
-    queryset = edu_request_models.StudentRequest.objects.filter(request_type=4)
-    permission_classes = (permission_classes.IsTeacher,)
-
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-
-        serializer = self.get_serializer(
-            instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        return Response(serializer.data)
-
-    def check_permissions(self, instance):
-        return self.request.user.is_chancellor == False
-
-    def perform_update(self, serializer):
-        # ثبت پاسخ معاون آموزشی
-        serializer.save(answer=self.request.data.get('answer'),
-                        status=self.request.data.get('status'))
-
-
-class Delete_Student_SemesterCreateView(generics.CreateAPIView):
-    serializer_class = edu_request_serializers.StudentRequestSerializer
-    queryset = edu_request_models.StudentRequest.objects.filter(request_type=5)
-    http_method_names = ['post']
-    permission_classes = (AllowAny,)
+    queryset = edu_request_models.StudentRequest
+    permission_classes = (permission_classes.IsTeacher |
+                          permission_classes.IsItManager,)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         course_term = get_object_or_404(
             edu_term_models.CourseTerm, pk=self.kwargs.get('course_term_pk'))
+        teacher = self.request.user
+        if not teacher:
+            raise Http404
         extra_context = {
-            'student': get_user_model().objects.first(),
-            'term': course_term.term,
-            'course_term': course_term,
-            'request_type': 5,
-            'status': 1,
+            'answer_user': teacher, 
+            # Use get with a default value
+            'answer': self.request.data.get('answer', ''),
+            # Use get with a default value
+            'status': self.request.data.get('status', ''),
         }
+
         context.update(extra_context)
         return context
-
-    def perform_create(self, serializer):
-        context = self.get_serializer_context()
-        serializer.validated_data['student'] = context.get('student')
-        serializer.validated_data['term'] = context.get('term')
-        serializer.validated_data['course_term'] = context.get('course_term')
-        serializer.validated_data['request_type'] = context.get('request_type')
-        serializer.validated_data['status'] = context.get('status')
-        return super().perform_create(serializer)
 
 
 class Delete_Student_SemesterListCreateView(generics.ListCreateAPIView):
