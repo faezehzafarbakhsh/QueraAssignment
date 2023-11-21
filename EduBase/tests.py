@@ -2,9 +2,24 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
 from EduBase import models
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class EduFieldTests(APITestCase):
+    def create_authenticated_user(self, permissions=None):
+        """
+        Helper method to create an authenticated user with specific permissions.
+        """
+        user = User.objects.create_user(
+            username='testuser',
+            password='testpassword1234',
+            email='testuser@example.com',
+            is_it_manager=True,
+        )
+        return user
+
     def setUp(self):
         # Create some sample data for testing
         self.edu_field_data = {
@@ -17,6 +32,7 @@ class EduFieldTests(APITestCase):
         self.edu_field_url = reverse('edu_field_list_create_view')
         self.detail_url = reverse('edu_field_retrieve_update_destroy_view', args=[
             self.edu_field.id])
+        self.client.force_authenticate(user=self.create_authenticated_user())
 
     def test_create_edu_field(self):
         response = self.client.post(self.edu_field_url, self.edu_field_data)
@@ -53,52 +69,70 @@ class EduFieldTests(APITestCase):
         self.assertEqual(models.EduField.objects.count(), 0)
 
 
-# course
-# class CourseTests(APITestCase):
-#     def setUp(self):
-#         self.college = models.College.objects.create(name='Sample College')
-#         self.course_data = {
-#             'name': 'Sample Course',
-#             'college': self.college,
-#             'unit_count': 3,
-#             'course_type': 1,
-#         }
-#         self.course = models.Course.objects.create(**self.course_data)
-#         self.course_list_create_url = reverse('course_list_create_view')
-#         self.course_detail_url = reverse('course_retrieve_update_destroy_view', args=[self.course.id])
-#
-#     def test_create_course(self):
-#         response = self.client.post(self.course_list_create_url, self.course_data)
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-#         self.assertEqual(models.Course.objects.count(), 2)
-#
-#     def test_get_course_list(self):
-#         response = self.client.get(self.course_list_create_url)
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self.assertEqual(response.data['count'], 1)
-#
-#     def test_get_course_detail(self):
-#         response = self.client.get(self.course_detail_url)
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self.assertEqual(response.data['name'], self.course_data['name'])
-#
-#     def test_update_course(self):
-#         college = models.College.objects.create(name='Sample College')
-#         updated_data = {
-#             'name': 'Updated Course Name',
-#             'college': college,
-#             'unit_count': 4,
-#             'course_type': 2,
-#         }
-#         response = self.client.put(self.course_detail_url, updated_data)
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self.course.refresh_from_db()
-#         self.assertEqual(self.course.name, updated_data['name'])
-#
-#     def test_delete_course(self):
-#         response = self.client.delete(self.course_detail_url)
-#         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-#         self.assertEqual(models.Course.objects.count(), 0)
+class CourseTests(APITestCase):
+    def create_authenticated_user(self, permissions=None):
+        """
+        Helper method to create an authenticated user with specific permissions.
+        """
+        user = User.objects.create_user(
+            username='testuser',
+            password='testpassword1234',
+            email='testuser@example.com',
+            is_it_manager=True,
+        )
+        return user
+
+    def setUp(self):
+        self.college = models.College.objects.create(name='Sample College')
+        print(self.college.id)
+        self.course_data = {
+            'name': 'Sample Course',
+            'college_id': self.college.id,
+            'unit_count': 3,
+            'course_type': 1,
+        }
+        self.course = models.Course.objects.create(**self.course_data)
+        self.course_list_create_url = reverse('course_list_create_view')
+        self.course_detail_url = reverse(
+            'course_retrieve_update_destroy_view', args=[self.course.id])
+        self.client.force_authenticate(user=self.create_authenticated_user())
+
+    def test_create_course(self):
+        self.college = models.College.objects.create(name='Sample College')
+        response = self.client.post(
+            self.course_list_create_url, self.course_data)
+        
+        print(response.content)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(models.Course.objects.count(), 2)
+
+    def test_get_course_list(self):
+        response = self.client.get(self.course_list_create_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+
+    def test_get_course_detail(self):
+        response = self.client.get(self.course_detail_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], self.course_data['name'])
+
+    def test_update_course(self):
+        college = models.College.objects.create(name='Sample College')
+        updated_data = {
+            'name': 'Updated Course Name',
+            'college_id': college.id,
+            'unit_count': 4,
+            'course_type': 2,
+        }
+        response = self.client.put(self.course_detail_url, updated_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.course.refresh_from_db()
+        self.assertEqual(self.course.name, updated_data['name'])
+
+    def test_delete_course(self):
+        response = self.client.delete(self.course_detail_url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(models.Course.objects.count(), 0)
 
 # class CourseTests(APITestCase):
 #     def setUp(self):

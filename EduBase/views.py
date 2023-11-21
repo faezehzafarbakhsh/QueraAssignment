@@ -10,14 +10,14 @@ class EduFieldListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_base_serializers.EduFieldSerializer
     queryset = edu_base_models.EduField.objects.all()
     http_method_names = ['get', 'post']
-    permission_classes = (AllowAny,)
+    permission_classes = (permission_classes.IsItManager,)
 
 
 class EduFieldRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = edu_base_serializers.EduFieldSerializer
     queryset = edu_base_models.EduField.objects.all()
     http_method_names = ['get', 'put', 'delete']
-    permission_classes = (AllowAny,)
+    permission_classes = (permission_classes.IsItManager,)
 
 
 class CourseListCreateView(generics.ListCreateAPIView):
