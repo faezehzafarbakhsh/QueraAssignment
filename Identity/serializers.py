@@ -288,7 +288,7 @@ class ItTeacherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = identity_models.User
-        fields = ['username', 'email', 'gender', 'college',
+        fields = ['username', 'email', 'gender','college',
                   'mobile', 'national_code', 'expert', 'level']
 
     def create(self, validated_data):
