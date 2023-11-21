@@ -60,7 +60,6 @@ class UserTokenLoginViewTest(APITestCase):
     def test_user_token_login_missing_token(self):
         data = {}
         response = self.client.post(self.url, data, format='json')
-        print(response)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_user_token_login_invalid_token(self):
@@ -71,35 +70,37 @@ class UserTokenLoginViewTest(APITestCase):
 
 
 class ITTeacherAPITestCase(APITestCase):
+    def create_authenticated_user(self, permissions=None):
+        """
+        Helper method to create an authenticated user with specific permissions.
+        """
+        user = User.objects.create_user(
+            username='testuser',
+            password='testpassword1234',
+            email='testuser@example.com',
+            is_it_manager=True,
+        )
+        return user
 
     def setUp(self):
-        # Create a test user with IsItManager permission
-        self.manager_user = User.objects.create_user(
-            username='manager', password='testpassword')
-        self.manager_user.is_it_manager = True
-        self.manager_user.save()
-
+        user = self.create_authenticated_user()
         # Create a test IT teacher
         self.it_teacher_data = {
             'username': 'it_teacher',
             'email': 'it_teacher@example.com',
-            'gender': 'M',
-            'college': 'IT College',
+            'gender': 1,
             'mobile': '1234567890',
             'national_code': '123456789',
-            'teachers': {
-                'expert': 'Programming',
-                'level': 'Advanced'
-            }
+            'expert': 'Programming',
+            'level': 'Advanced'
         }
-        self.client.force_authenticate(user=self.manager_user)
+        self.client.force_authenticate(user=user)
 
     def test_create_it_teacher(self):
         # Replace with your actual URL name
         url = reverse('it-teacher-list-create')
         response = self.client.post(
             url, data=self.it_teacher_data, format='json')
-        print(response)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(User.objects.filter(username='it_teacher').exists())
         self.assertTrue(identity_models.Teacher.objects.filter(
@@ -111,7 +112,7 @@ class ITTeacherAPITestCase(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data),
+        self.assertEqual(response.data['count'],
                          User.objects.filter(is_teacher=True).count())
 
     def test_get_it_teacher_detail(self):
@@ -124,7 +125,6 @@ class ITTeacherAPITestCase(APITestCase):
         # Replace with your actual URL name
         url = reverse('it-teacher-detail', kwargs={'pk': it_teacher.id})
         response = self.client.get(url)
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['username'], 'teacher')
         self.assertEqual(response.data['expert'], 'Networking')
@@ -138,20 +138,19 @@ class ITTeacherAPITestCase(APITestCase):
         )
 
         updated_data = {
-            'email': 'new_email@example.com',
-            'teachers': {
-                'expert': 'Database',
-                'level': 'Beginner'
-            }
+            'username': 'aldfjjasdfieh',
+            'email': 'newemail@example.com',
+            'expert': 'Database',
+            'level': 'Beginner',
+            'national_code': '12345',
         }
 
         # Replace with your actual URL name
         url = reverse('it-teacher-detail', kwargs={'pk': it_teacher.id})
         response = self.client.put(url, data=updated_data, format='json')
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         it_teacher.refresh_from_db()
-        self.assertEqual(it_teacher.email, 'new_email@example.com')
+        self.assertEqual(it_teacher.email, 'newemail@example.com')
         self.assertEqual(it_teacher.teachers.expert, 'Database')
         self.assertEqual(it_teacher.teachers.level, 'Beginner')
 
@@ -170,3 +169,107 @@ class ITTeacherAPITestCase(APITestCase):
         self.assertFalse(User.objects.filter(username='teacher').exists())
         self.assertFalse(identity_models.Teacher.objects.filter(
             user=it_teacher, expert='Networking', level='Intermediate').exists())
+
+
+class ITStudentAPITestCase(APITestCase):
+    def create_authenticated_user(self, permissions=None):
+        """
+        Helper method to create an authenticated user with specific permissions.
+        """
+        user = User.objects.create_user(
+            username='testuser',
+            password='testpassword1234',
+            email='testuser@example.com',
+            is_it_manager=True,
+        )
+        return user
+
+    def setUp(self):
+        user = self.create_authenticated_user()
+        # Create a test IT teacher
+        self.it_student_data = {
+            "username": "student",
+            "gender": 1,
+            "college": 1,
+            "national_code": "54874",
+            "entry_year": "2023-11-17",
+            "entry_term": 1,
+            "average": 2.0,
+            "academic_year": 1
+
+        }
+        self.client.force_authenticate(user=user)
+
+    def test_create_it_student(self):
+        # Replace with your actual URL name
+        url = reverse('it-student-list-create')
+        response = self.client.post(
+            url, data=self.it_student_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(User.objects.filter(username='student').exists())
+        self.assertTrue(identity_models.Student.objects.filter(
+            average=2.0, academic_year=1).exists())
+
+    def test_get_it_student_list(self):
+        # Replace with your actual URL name
+        url = reverse('it-student-list-create')
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'],
+                         User.objects.filter(is_student=True).count())
+
+    def test_get_it_student_detail(self):
+        it_student = User.objects.create_user(
+            username='student', password='testpassword', is_student=True)
+        it_student.students = identity_models.Student.objects.create(
+            user=it_student,average=20, academic_year=3
+        )
+
+        # Replace with your actual URL name
+        url = reverse('it-student-detail', kwargs={'pk': it_student.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['username'], 'student')
+        self.assertEqual(response.data['average'], 20)
+        self.assertEqual(response.data['academic_year'], 3)
+
+    def test_update_it_student(self):
+        it_student = User.objects.create_user(
+            username='student', password='testpassword', is_student=True)
+        it_student.students = identity_models.Student.objects.create(
+            user=it_student,average=20, academic_year=3
+        )
+
+        updated_data = {
+            'username': 'aldfjjasdfieh',
+            'email': 'newemail@example.com',
+            "entry_year": "2022-11-17",
+            "entry_term": 2,
+            "average": 20,
+            "academic_year": 3
+        }
+
+        # Replace with your actual URL name
+        url = reverse('it-student-detail', kwargs={'pk': it_student.id})
+        response = self.client.put(url, data=updated_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        it_student.refresh_from_db()
+        self.assertEqual(it_student.email, 'newemail@example.com')
+        self.assertEqual(it_student.students.entry_year, "2022-11-17")
+        self.assertEqual(it_student.students.average, 20)
+
+    def test_delete_it_student(self):
+        it_student = User.objects.create_user(
+            username='student', password='testpassword', is_student=True)
+        it_student.students = identity_models.Student.objects.create(
+            user=it_student,average=20, academic_year=3
+        )
+        # Replace with your actual URL name
+        url = reverse('it-student-detail', kwargs={'pk': it_student.id})
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(User.objects.filter(username='student').exists())
+        self.assertFalse(identity_models.Student.objects.filter(
+            user=it_student, expert='Networking', level='Intermediate').exists())

@@ -352,8 +352,10 @@ class ItTeacherSerializer(serializers.ModelSerializer):
                 setattr(instance, field, validated_data[field])
 
         # Update Teacher fields
-        for field in ['expert', 'level']:
-            setattr(instance.teachers, field, locals()[field])
+        teacher=identity_models.Teacher.objects.get(user=instance,)
+        setattr(teacher, 'expert', expert)
+        setattr(teacher, 'level', level)
+        teacher.save()
 
         instance.save()
 
@@ -440,8 +442,11 @@ class ItStudentSerializer(serializers.ModelSerializer):
                 setattr(instance, field, validated_data[field])
 
         # Update Student fields
+        student = identity_models.Student.objects.get(user=instance)
         for field in ['entry_year', 'entry_term', 'current_term', 'average', 'academic_year']:
-            setattr(instance.students, field, locals()[field])
+            setattr(student, field, students_data.get(field))
+    
+        student.save()
 
         instance.save()
 

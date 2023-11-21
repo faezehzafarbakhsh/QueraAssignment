@@ -21,9 +21,9 @@ urlpatterns = [
          identity_views.ItTeacherRetrieveUpdateDestroyView.as_view(),name ='it-teacher-detail'),
 
     # Students
-    path('admin/students/', identity_views.ItStudentListCreateView.as_view()),
+    path('admin/students/', identity_views.ItStudentListCreateView.as_view(), name='it-student-list-create'),
     path('admin/students/<int:pk>/',
-         identity_views.ItStudentRetrieveUpdateDestroyView.as_view()),
+         identity_views.ItStudentRetrieveUpdateDestroyView.as_view(), name='it-student-detail'),
 
     # Chancellors
     path('admin/assistants/', identity_views.ItChancellorListCreateView.as_view()),
