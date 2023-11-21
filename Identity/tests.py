@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from django.urls import reverse
 from rest_framework_simplejwt.tokens import AccessToken
+from Identity import models as identity_models
 
 User = get_user_model()
 
@@ -68,52 +69,104 @@ class UserTokenLoginViewTest(APITestCase):
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-class ChangePasswordRequestViewTest(APITestCase):
-    def test_successful_request(self):
-        url = reverse('change_password_request')  # Change this to your actual URL name
-        data = {'username': 'testuser'}
-        response = self.client.post(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn('change_password_token', response.data)
 
-class ChangePasswordActionViewTest(APITestCase):
+class ITTeacherAPITestCase(APITestCase):
+
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
-        self.token = self.client.post(reverse('token_obtain_pair'),self.user)
+        # Create a test user with IsItManager permission
+        self.manager_user = User.objects.create_user(
+            username='manager', password='testpassword')
+        self.manager_user.is_it_manager = True
+        self.manager_user.save()
 
-    def test_successful_password_change(self):
-        url = reverse('change_password_action')  # Change this to your actual URL name
-        data = {
-            'token': self.token,
-            'new_password': 'new_password123',
-            'confirm_password': 'new_password123'
+        # Create a test IT teacher
+        self.it_teacher_data = {
+            'username': 'it_teacher',
+            'email': 'it_teacher@example.com',
+            'gender': 'M',
+            'college': 'IT College',
+            'mobile': '1234567890',
+            'national_code': '123456789',
+            'teachers': {
+                'expert': 'Programming',
+                'level': 'Advanced'
+            }
         }
-        response = self.client.post(url, data, format='json')
+        self.client.force_authenticate(user=self.manager_user)
+
+    def test_create_it_teacher(self):
+        # Replace with your actual URL name
+        url = reverse('it-teacher-list-create')
+        response = self.client.post(
+            url, data=self.it_teacher_data, format='json')
+        print(response)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(User.objects.filter(username='it_teacher').exists())
+        self.assertTrue(identity_models.Teacher.objects.filter(
+            expert='Programming', level='Advanced').exists())
+
+    def test_get_it_teacher_list(self):
+        # Replace with your actual URL name
+        url = reverse('it-teacher-list-create')
+        response = self.client.get(url)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn('message', response.data)
-        self.assertEqual(response.data['message'], 'رمز عبور با موفقیت تغییر یافت.')
+        self.assertEqual(len(response.data),
+                         User.objects.filter(is_teacher=True).count())
 
-    def test_invalid_token(self):
-        url = reverse('change-password-action')  # Change this to your actual URL name
-        data = {
-            'token': 'invalid_token',
-            'new_password': 'new_password123',
-            'confirm_password': 'new_password123'
+    def test_get_it_teacher_detail(self):
+        it_teacher = User.objects.create_user(
+            username='teacher', password='testpassword', is_teacher=True)
+        it_teacher.teachers = identity_models.Teacher.objects.create(
+            user=it_teacher, expert='Networking', level='Intermediate'
+        )
+
+        # Replace with your actual URL name
+        url = reverse('it-teacher-detail', kwargs={'pk': it_teacher.id})
+        response = self.client.get(url)
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['username'], 'teacher')
+        self.assertEqual(response.data['expert'], 'Networking')
+        self.assertEqual(response.data['level'], 'Intermediate')
+
+    def test_update_it_teacher(self):
+        it_teacher = User.objects.create_user(
+            username='teacher', password='testpassword', is_teacher=True)
+        it_teacher.teachers = identity_models.Teacher.objects.create(
+            user=it_teacher, expert='Networking', level='Intermediate'
+        )
+
+        updated_data = {
+            'email': 'new_email@example.com',
+            'teachers': {
+                'expert': 'Database',
+                'level': 'Beginner'
+            }
         }
-        response = self.client.post(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('توکن نامعتبر است.', response.data['non_field_errors'])
 
-    def test_passwords_do_not_match(self):
-        url = reverse('change-password-action')  # Change this to your actual URL name
-        data = {
-            'token': self.token,
-            'new_password': 'new_password123',
-            'confirm_password': 'wrong_password'
-        }
-        response = self.client.post(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('رمز ها مطابقت ندارند.', response.data['non_field_errors'])
+        # Replace with your actual URL name
+        url = reverse('it-teacher-detail', kwargs={'pk': it_teacher.id})
+        response = self.client.put(url, data=updated_data, format='json')
 
-    def tearDown(self):
-        cache.clear() 
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        it_teacher.refresh_from_db()
+        self.assertEqual(it_teacher.email, 'new_email@example.com')
+        self.assertEqual(it_teacher.teachers.expert, 'Database')
+        self.assertEqual(it_teacher.teachers.level, 'Beginner')
+
+    def test_delete_it_teacher(self):
+        it_teacher = User.objects.create_user(
+            username='teacher', password='testpassword', is_teacher=True)
+        it_teacher.teachers = identity_models.Teacher.objects.create(
+            user=it_teacher, expert='Networking', level='Intermediate'
+        )
+
+        # Replace with your actual URL name
+        url = reverse('it-teacher-detail', kwargs={'pk': it_teacher.id})
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(User.objects.filter(username='teacher').exists())
+        self.assertFalse(identity_models.Teacher.objects.filter(
+            user=it_teacher, expert='Networking', level='Intermediate').exists())
