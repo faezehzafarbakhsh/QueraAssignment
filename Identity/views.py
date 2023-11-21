@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from django.contrib.auth import logout
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from Identity import models as identity_models
 from Identity import serializers as identity_serializers
@@ -15,6 +16,17 @@ from Identity import custom_classes
 User = get_user_model()
 
 # Authentication Views
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = identity_serializers.CustomTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 class UserRegisterIView(generics.CreateAPIView):
