@@ -303,8 +303,8 @@ class ItTeacherListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.all()
     http_method_names = ['post', 'get']
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
-
     def get_queryset(self):
+        print(self.request.data)
         return User.objects.filter(is_teacher=True)
 
 

@@ -63,6 +63,33 @@ class RegisterSerializer(serializers.ModelSerializer):
             'password': {'write_only': True, 'style': {'input_type': 'password'}},
         }
 
+    def validate(self, attrs):
+        """
+        Validates the password fields.
+
+        Args:
+            attrs (dict): The dictionary containing the serialized data.
+
+        Returns:
+            dict: The validated attributes.
+
+        Raises:
+            serializers.ValidationError: If the passwords do not match or do not meet the requirements.
+        """
+        password1 = attrs.get('password')
+        password2 = attrs.get('password2')
+
+        if password1 != password2:
+            raise serializers.ValidationError("گذرواژه ها مطابقت ندارند.")
+
+        # Use Django's password validation
+        try:
+            validate_password(password1, self.instance)
+        except serializers.ValidationError as e:
+            raise serializers.ValidationError(str(e))
+
+        return attrs
+
     def create(self, validated_data):
         """
         Creates a new user instance with the provided data.
@@ -263,6 +290,7 @@ class ChangePasswordActionSerializer(serializers.Serializer):
 
         return user
 
+
 # It Manager Serializers
 
 
@@ -288,7 +316,7 @@ class ItTeacherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = identity_models.User
-        fields = ['username', 'email', 'gender','college',
+        fields = ['username', 'email', 'gender', 'college',
                   'mobile', 'national_code', 'expert', 'level']
 
     def create(self, validated_data):
@@ -324,8 +352,10 @@ class ItTeacherSerializer(serializers.ModelSerializer):
                 setattr(instance, field, validated_data[field])
 
         # Update Teacher fields
-        for field in ['expert', 'level']:
-            setattr(instance.teachers, field, locals()[field])
+        teacher=identity_models.Teacher.objects.get(user=instance,)
+        setattr(teacher, 'expert', expert)
+        setattr(teacher, 'level', level)
+        teacher.save()
 
         instance.save()
 
@@ -365,7 +395,7 @@ class ItStudentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = identity_models.User
-        fields = ['username', 'email', 'gender','college', 
+        fields = ['username', 'email', 'gender', 'college',
                   'mobile', 'national_code', 'entry_year', 'edu_field', 'entry_term', 'current_term', 'average', 'academic_year']
 
     def create(self, validated_data):
@@ -412,8 +442,11 @@ class ItStudentSerializer(serializers.ModelSerializer):
                 setattr(instance, field, validated_data[field])
 
         # Update Student fields
+        student = identity_models.Student.objects.get(user=instance)
         for field in ['entry_year', 'entry_term', 'current_term', 'average', 'academic_year']:
-            setattr(instance.students, field, locals()[field])
+            setattr(student, field, students_data.get(field))
+    
+        student.save()
 
         instance.save()
 
