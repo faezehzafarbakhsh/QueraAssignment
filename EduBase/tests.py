@@ -59,7 +59,7 @@ class EduFieldTests(APITestCase):
 #         self.college = models.College.objects.create(name='Sample College')
 #         self.course_data = {
 #             'name': 'Sample Course',
-#             'college': self.college.id,
+#             'college': self.college,
 #             'unit_count': 3,
 #             'course_type': 1,
 #         }
@@ -75,7 +75,7 @@ class EduFieldTests(APITestCase):
 #     def test_get_course_list(self):
 #         response = self.client.get(self.course_list_create_url)
 #         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self.assertEqual(len(response.data), 1)
+#         self.assertEqual(response.data['count'], 1)
 #
 #     def test_get_course_detail(self):
 #         response = self.client.get(self.course_detail_url)
@@ -83,9 +83,10 @@ class EduFieldTests(APITestCase):
 #         self.assertEqual(response.data['name'], self.course_data['name'])
 #
 #     def test_update_course(self):
+#         college = models.College.objects.create(name='Sample College')
 #         updated_data = {
 #             'name': 'Updated Course Name',
-#             'college': self.college.id,
+#             'college': college,
 #             'unit_count': 4,
 #             'course_type': 2,
 #         }
@@ -98,9 +99,23 @@ class EduFieldTests(APITestCase):
 #         response = self.client.delete(self.course_detail_url)
 #         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 #         self.assertEqual(models.Course.objects.count(), 0)
-#
-#
-# # Course_relation
+
+# class CourseTests(APITestCase):
+#     def setUp(self):
+#         self.college = models.College.objects.create(name='Sample College')
+#         self.course_data = {
+#             'name': 'Sample Course',
+#             'college': self.college,  # Pass the College instance directly
+#             'unit_count': 3,
+#             'course_type': 1,
+#         }
+#         self.course = models.Course.objects.create(**self.course_data)
+#         self.course_list_create_url = reverse('course_list_create_view')
+#         self.course_detail_url = reverse('course_retrieve_update_destroy_view', args=[self.course.id])
+
+    # ... rest of your test methods ...
+
+# Course_relation
 # class CourseRelationTests(APITestCase):
 #     def setUp(self):
 #         self.primary_course = models.Course.objects.create(
