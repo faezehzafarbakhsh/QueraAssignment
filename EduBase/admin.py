@@ -1,13 +1,13 @@
+from typing import Any
 from django.contrib import admin
+from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 from . import models
-from .models import Course, CourseRelation
-from django.urls import reverse, NoReverseMatch
-from django.utils.html import format_html
-from EduBase import admin_panel_permissions
 # Register your models here.
 
 # EduField
+
+
 @admin.register(models.EduField)
 class EduFieldAdmin(admin.ModelAdmin):
     list_display = ('name', 'edu_group', 'unit_count', 'edu_grade')
@@ -23,9 +23,14 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ('name', 'college', 'unit_count', 'course_type')
     list_filter = ('name', 'college', 'unit_count', 'course_type')
     search_fields = ('name', 'college', 'unit_count', 'course_type')
-    
-    def has_add_permission(self, request):
-        return admin_panel_permissions.BaseChancellorPermission.has_add_permission(request)
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
+        qs = super().get_queryset(request)
+        user = request.user
+        chancellor_college = user.college
+        if user.is_chancellor:
+            qs = qs.filter(college=chancellor_college)
+        return qs
 
 
 # CourseRelation
