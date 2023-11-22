@@ -6,15 +6,27 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from django.contrib.auth import logout
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from Identity import models as identity_models
 from Identity import serializers as identity_serializers
 from Identity import permission_classes as custom_permissions
-from Identity import custom_classes
+from Identity import custom_classes , tasks
 
 User = get_user_model()
 
 # Authentication Views
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = identity_serializers.CustomTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 class UserRegisterIView(generics.CreateAPIView):
@@ -89,37 +101,6 @@ class UserTokenLoginView(generics.CreateAPIView):
     http_method_names = ['post']
     permission_classes = (AllowAny,)
 
-    def get_serializer_context(self):
-        """
-        Retrieves the context for the serializer.
-
-        Returns:
-            dict: The context for the serializer.
-
-        Raises:
-            None
-        """
-        context = super().get_serializer_context()
-        return context
-
-    def perform_create(self, serializer):
-        """
-        Validates and processes the user login data.
-
-        Args:
-            serializer: The serializer instance.
-
-        Returns:
-            Response: JSON response with a success message upon successful user login.
-
-        Raises:
-            None
-        """
-        context = self.get_serializer_context()
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        return super().perform_create(serializer)
-
     def post(self, request, *args, **kwargs):
         """
         Handles the POST request and returns a JSON response upon successful user login.
@@ -135,6 +116,10 @@ class UserTokenLoginView(generics.CreateAPIView):
         Raises:
             None
         """
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
         return Response({"message": "کاربر با موفقیت وارد سایت شد."}, status=status.HTTP_200_OK)
 
 
@@ -196,7 +181,7 @@ class ChangePasswordRequestView(generics.GenericAPIView):
     serializer_class = identity_serializers.ChangePasswordRequestSerializer
     queryset = User.objects.all()
     http_method_names = ['post']
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
         """
@@ -220,7 +205,7 @@ class ChangePasswordRequestView(generics.GenericAPIView):
         user = User.objects.get(username=username)
 
         cached_token = custom_classes.CacheManager().set_cache_token(user)
-
+        email = tasks.send_change_password_email(user_email=user.email,token= str(cached_token))
         return Response(
             {'message': 'توکن یکبار مصرف برای تغییر رمز ارسال شد.',
              'change_password_token': str(cached_token)},
@@ -249,16 +234,7 @@ class ChangePasswordActionView(generics.CreateAPIView):
     http_method_names = ['post', 'get']
     permission_classes = (AllowAny,)
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        user = self.request.user
-        extra_context = {
-            "stored_token_for_user": custom_classes.CacheManager.get_cache_token(user)
-        }
-        context.update(extra_context)
-        return context
-
-    def perform_create(self, serializer):
+    def perform_create(self,  serializer):
         """
         Changes the user's password based on the provided token.
 
@@ -268,6 +244,7 @@ class ChangePasswordActionView(generics.CreateAPIView):
         Returns:
             None
         """
+
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
@@ -285,8 +262,15 @@ class ChangePasswordActionView(generics.CreateAPIView):
 
         Raises:
             None
+
         """
-        serializer = self.get_serializer(data=request.data)
+        user_id = AccessToken(request.data['token']).payload['user_id']
+        stored_token_for_user = custom_classes.CacheManager.get_cache_token(
+            user_id)
+        serializer = self.get_serializer(data=request.data, context={
+                                         "stored_token_for_user": stored_token_for_user,
+                                         'user_id': user_id
+                                         })
         self.perform_create(serializer)
 
         custom_classes.CacheManager.delete_cache_token(request.user)
@@ -320,8 +304,8 @@ class ItTeacherListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.all()
     http_method_names = ['post', 'get']
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
-
     def get_queryset(self):
+        print(self.request.data)
         return User.objects.filter(is_teacher=True)
 
 
@@ -446,3 +430,70 @@ class ItChancellorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVie
     serializer_class = identity_serializers.ItChancellorSerializer
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
+
+# Chancellor Views
+
+
+class ChancellorStudentsListView(generics.ListAPIView):
+
+    serializer_class = identity_serializers.ChancellorStudentSerializer
+    http_method_names = ['post', 'get']
+    permission_classes = (
+        IsAuthenticated, custom_permissions.IsItManager | custom_permissions.IsChancellor)
+
+    def get_queryset(self):
+        if self.request.user.is_chancellor:
+            college = self.request.user.college
+
+            if college:
+                queryset = User.objects.filter(
+                    is_student=True, college=college)
+            else:
+                queryset = User.objects.none()
+        else:
+            queryset = User.objects.all()
+
+        return queryset
+
+
+class ChancellorStudentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+
+    serializer_class = identity_serializers.ChancellorStudentSerializer
+    permission_classes = (IsAuthenticated, custom_permissions.IsItManager |
+                          custom_permissions.IsChancellor)
+
+    def get_queryset(self):
+        if self.request.user.is_chancellor:
+            college = self.request.user.college
+
+            if college:
+                queryset = User.objects.filter(
+                    is_student=True, college=college)
+            else:
+                queryset = User.objects.none()
+        else:
+            queryset = User.objects.all()
+
+        return queryset
+
+
+class ChancellorTeacherListView(generics.ListAPIView):
+
+    serializer_class = identity_serializers.ChancellorTeacherSerializer
+    http_method_names = ['post', 'get']
+    permission_classes = (
+        IsAuthenticated, custom_permissions.IsItManager | custom_permissions.IsChancellor)
+
+    def get_queryset(self):
+        if self.request.user.is_chancellor:
+            college = self.request.user.college
+
+            if college:
+                queryset = User.objects.filter(
+                    is_teacher=True, college=college)
+            else:
+                queryset = User.objects.none()
+        else:
+            queryset = User.objects.all()
+
+        return queryset

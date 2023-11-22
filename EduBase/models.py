@@ -46,6 +46,10 @@ class Course(models.Model):
     course_type = models.IntegerField(choices=CourseTypeChoices.choices, verbose_name=vn_edu_base.COURSE_COURSE_TYPE)
 
     objects = CourseManager()
+    
+    def __str__(self) -> str:
+        return self.name
+
 
 
 class CourseRelationManager(models.Manager):
@@ -71,6 +75,7 @@ class CourseRelation(models.Model):
                                         verbose_name=vn_edu_base.COURSE_RELATION_RELATION_TYPE)
 
     objects = CourseRelationManager()
+    
 
 
 class CollegeManager(models.Manager):
@@ -81,4 +86,7 @@ class College(models.Model):
     name = models.CharField(max_length=64, verbose_name=vn_edu_base.COLLEGE_NAME)
 
     objects = CollegeManager()
+    
+    def __str__(self) -> str:
+        return self.name
 

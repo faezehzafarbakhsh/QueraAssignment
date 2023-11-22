@@ -13,6 +13,24 @@ class CourseSerializer(serializers.ModelSerializer):
         model = edu_base_models.Course
         fields = ['name', 'college', 'unit_count', 'course_type', ]
 
+    def validate(self, data):
+        """
+        Check if the college selected for the course matches the chancellor's college.
+        """
+        request = self.context.get('request')
+
+        user = request.user
+        
+        if user.is_chancellor:
+            chancellor_college = user.college
+            selected_college = data.get('college')
+            
+            if selected_college != chancellor_college:
+                raise serializers.ValidationError(
+                    "دانشکده انتخاب شده باید با دانشکده معاون آموزشی یکی باشد.")
+
+        return data
+
 
 class CourseRelationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,7 +42,3 @@ class CollegeSerializer(serializers.ModelSerializer):
     class Meta:
         model = edu_base_models.College
         fields = ['name', ]
-
-
-
-
