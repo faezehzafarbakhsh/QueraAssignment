@@ -175,24 +175,24 @@ LOCALE_PATHS = (
     os.path.join(BASE_DIR, "locale"),
 )
 
+# Celery configuration
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Tehran'
 
+# Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# add your host of the email here in this case its Gmail so we are going to use Gmail host
 EMAIL_HOST = 'smtp.gmail.com'
 CELERY_RESULT_BACKEND = 'rpc://'
 EMAIL_USE_TLS = True
-# add the port number of the email server
 EMAIL_PORT = 587
-# add your gamil here
 EMAIL_HOST_USER = 'quera0322@gmail.com@gmail.com'
-# add your password here
 EMAIL_HOST_PASSWORD = 'asdfgj79595'
 DEFAULT_FROM_EMAIL = 'Celery quera0322@gmail.com'
+
+# Redis
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
@@ -203,7 +203,7 @@ CACHES = {
     }
 }
 
-# settings.py
+# Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
