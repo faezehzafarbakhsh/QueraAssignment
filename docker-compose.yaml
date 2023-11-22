@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:14
+    env_file:
+      - .env.production
+    environment:
+      POSTGRES_DB: "${DEFAULT_DATABASE_NAME}"
+      POSTGRES_USER: "${DEFAULT_DATABASE_USER}"
+      POSTGRES_PASSWORD: "${DEFAULT_DATABASE_PASSWORD}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  redis:
+    image: "redis:alpine"
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+      - static_volume:/code/${STATIC_ROOT_NAME}
+      - media_volume:/code/${MEDIA_DIR_NAME}
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.production
+    depends_on:
+      - db
+      - redis
+
+  celery:
+    build: .
+    command: celery -A your_project_name worker --loglevel=info
+    volumes:
+      - .:/code
+    env_file:
+      - .env.production
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
