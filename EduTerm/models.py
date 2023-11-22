@@ -24,8 +24,8 @@ class Term(models.Model):
     modify_end_datetime = jmodels.jDateTimeField(verbose_name=vn_edu_term.TERM_MODIFY_END_DATETIME)
     emergency_course_drop_end_datetime = jmodels.jDateTimeField(
         verbose_name=vn_edu_term.TERM_EMERGENCY_COURSE_DROP_END_DATETIME)
-    exam_start_date = jmodels.jDateField(verbose_name=vn_edu_term.TERM_EXAM_START_DATE,default=None)
-    term_end_date = jmodels.jDateField(verbose_name=vn_edu_term.TERM_TERM_END_DATE,default=None)
+    exam_start_date = jmodels.jDateField(verbose_name=vn_edu_term.TERM_EXAM_START_DATE)
+    term_end_date = jmodels.jDateField(verbose_name=vn_edu_term.TERM_TERM_END_DATE)
     active_term = models.BooleanField(default=False, verbose_name=vn_edu_term.TERM_ACTIVE_TERM)
 
     objects = TermManager()
