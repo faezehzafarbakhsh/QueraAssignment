@@ -6,7 +6,7 @@ WORKDIR /code
 
 RUN apt-get update \
   # dependencies
-  && apt-get install -y build-essential netcatlibpq-dev gettext postgesql-client\
+  && apt-get install -y build-essential libpq-dev gettext postgresql-client \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
 

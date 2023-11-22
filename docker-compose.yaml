@@ -9,6 +9,7 @@ services:
       POSTGRES_DB: "${DEFAULT_DATABASE_NAME}"
       POSTGRES_USER: "${DEFAULT_DATABASE_USER}"
       POSTGRES_PASSWORD: "${DEFAULT_DATABASE_PASSWORD}"
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 
@@ -32,7 +33,7 @@ services:
 
   celery:
     build: .
-    command: celery -A your_project_name worker --loglevel=info
+    command: celery -A QueraPyRate worker --loglevel=info
     volumes:
       - .:/code
     env_file:
