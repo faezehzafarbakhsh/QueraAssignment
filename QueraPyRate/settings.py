@@ -192,13 +192,12 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 
-# Redis
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': os.environ.get("REDIS_LOCATION"),
+        'LOCATION':'redis://localhost:6379/1',
         'OPTIONS': {
-            'CLIENT_CLASS': os.environ.get("REDIS_CLIENT"),
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
     }
 }
