@@ -7,11 +7,14 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import logout
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django_filters import rest_framework as filters
 
 from Identity import models as identity_models
 from Identity import serializers as identity_serializers
 from Identity import permission_classes as custom_permissions
-from Identity import custom_classes , tasks
+from Identity import custom_classes , tasks 
+from Identity import filters as identity_filters 
+
 
 User = get_user_model()
 
@@ -304,8 +307,9 @@ class ItTeacherListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.all()
     http_method_names = ['post', 'get']
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = identity_filters.TeacherFilter
     def get_queryset(self):
-        print(self.request.data)
         return User.objects.filter(is_teacher=True)
 
 
@@ -354,8 +358,9 @@ class ItStudentListCreateView(generics.ListCreateAPIView):
     """
     serializer_class = identity_serializers.ItStudentSerializer
     queryset = User.objects.all()
-    http_method_names = ['post', 'get']
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = identity_filters.StudentFilter
 
     def get_queryset(self):
         return User.objects.filter(is_student=True)

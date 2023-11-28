@@ -37,7 +37,6 @@ class StudentAdmin(admin.ModelAdmin):
 
 @admin.register(models.Teacher)
 class TeacherAdmin(admin.ModelAdmin):
-    list_display = ('user', 'level', 'expert')
     list_filter = ('user', 'level', 'expert')
     search_fields = ('user__username', 'user__first_name', 'user__last_name',
                      'user__email', 'user__ national_code', 'level', 'expert')
