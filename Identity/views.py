@@ -412,6 +412,8 @@ class ItChancellorListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.all()
     http_method_names = ['post', 'get']
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = identity_filters.ChancellorFilter
 
     def get_queryset(self):
         return User.objects.filter(is_chancellor=True)
@@ -445,6 +447,8 @@ class ChancellorStudentsListView(generics.ListAPIView):
     http_method_names = ['post', 'get']
     permission_classes = (
         IsAuthenticated, custom_permissions.IsItManager | custom_permissions.IsChancellor)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = identity_filters.StudentFilter
 
     def get_queryset(self):
         if self.request.user.is_chancellor:
@@ -488,6 +492,8 @@ class ChancellorTeacherListView(generics.ListAPIView):
     http_method_names = ['post', 'get']
     permission_classes = (
         IsAuthenticated, custom_permissions.IsItManager | custom_permissions.IsChancellor)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = identity_filters.TeacherFilter
 
     def get_queryset(self):
         if self.request.user.is_chancellor:

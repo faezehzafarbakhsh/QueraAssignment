@@ -14,3 +14,9 @@ class StudentFilter(filters.FilterSet):
         model = models.User
         fields = ['unique_code', 'first_name', 'last_name', 'national_code',
                   'college', 'military_service', 'students__entry_year', ]
+
+class ChancellorFilter(filters.FilterSet):
+    class Meta:
+        model = models.User
+        fields = ['unique_code', 'first_name', 'last_name', 'national_code',
+                  'college',  ]
