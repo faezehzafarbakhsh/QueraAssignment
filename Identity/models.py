@@ -80,7 +80,7 @@ class User(user_models.AbstractUser):
         super().save(*args, **kwargs)
 
     def _generate_unique_code(self):
-        prefix = 'su' if self.is_student else 'th' if self.is_teacher else ''
+        prefix = 'su' if self.is_student else 'th' if self.is_teacher else 'ch'
         return f'{prefix}-{get_random_string(length=5)}'
 
     class Meta:
