@@ -37,7 +37,17 @@ class Enrollment(models.Model):
 
 
 class StudentCourseManager(models.Manager):
-    pass
+    def get_not_passed_pre_request_course_by_student_exists(self, student, course_relation):
+        return self.filter(Q(student=student) & Q(status=3) & ~Q(course_term__course__in=course_relation)).exists()
+
+    def get_passed_course_by_student_exists(self, student, course_term):
+        return self.filter(Q(student=student) & Q(status=3) & Q(course_term=course_term)).exists()
+
+    def get_count_of_student_enroll_in_course_capacity(self, course_term):
+        return self.filter(course_term__course=course_term).count()
+
+    def get_average_by_term_and_student(self, student, term):
+        return self.filter(Q(student=student) & Q(course_term__term=term)).aggregate(Avg('score'))
 
 
 class StudentCourse(models.Model):
