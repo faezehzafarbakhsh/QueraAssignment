@@ -1,13 +1,18 @@
 from django.contrib.auth import get_user_model
 from django.core import validators as core_validators
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Avg
 
 from EduEnroll import variable_names as vn_edu_enroll
 
 
 class EnrollmentManager(models.Manager):
-    pass
+
+    def get_last_term_by_student(self, student):
+        return self.get_total_approved_term(student).first()
+
+    def get_total_approved_term(self, student):
+        return self.filter(Q(student=student) & Q(status=2))
 
 
 class Enrollment(models.Model):
