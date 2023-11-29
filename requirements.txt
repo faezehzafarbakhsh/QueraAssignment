@@ -51,4 +51,4 @@ tzdata==2023.3
 uritemplate==4.1.1
 vine==5.1.0
 wcwidth==0.2.10
-# uWSGI==2.0.23
+uWSGI==2.0.23
