@@ -32,7 +32,8 @@ class Term(models.Model):
 
 
 class CourseTermManager(models.Manager):
-    pass
+    def get_course_term_by_list_id(self, course_term_id):
+        return self.filter(pk__in=course_term_id)
 
 
 class CourseTerm(models.Model):

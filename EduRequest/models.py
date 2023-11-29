@@ -18,7 +18,7 @@ class StudentRequest(models.Model):
         IN_PROGRESS = 3, vn_edu_request.IN_PROGRESS
 
     class RequestTypeChoices(models.IntegerChoices):
-        Late_Add_drop = 1, vn_edu_request.Late_Add_drop
+        LATE_ADD_DROP = 1, vn_edu_request.LATE_ADD_DROP
         EMPLOYMENT_IN_EDUCATION = 2, vn_edu_request.EMPLOYMENT_IN_EDUCATION
         REGISTERING = 3, vn_edu_request.REGISTERING
         APPEAL = 4, vn_edu_request.APPEAL
