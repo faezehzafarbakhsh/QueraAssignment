@@ -4,6 +4,11 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from EduTerm import serializers as edu_term_serializers
 from EduTerm import models as edu_term_models
 from Identity import permission_classes
+
+'''ADDING FILTRIES
+'''
+from EduTerm import filters as EDUTerm_FILTERS
+from django_filters import rest_framework as filters
 # Create your views here.
 
 
@@ -12,14 +17,17 @@ class TermListCreateView(generics.ListCreateAPIView):
     queryset = edu_term_models.Term.objects.all()
     http_method_names = ['get', 'post', ]
     permission_classes = (IsAuthenticated, permission_classes.IsItManager)
-
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = EDUTerm_FILTERS.Termfilters
+    
 
 class TermRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = edu_term_serializers.TermSerializer
     queryset = edu_term_models.Term.objects.all()
     http_method_names = ['get', 'put', 'delete',]
     permission_classes = (IsAuthenticated, permission_classes.IsItManager)
-
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = EDUTerm_FILTERS.Termfilters
 
 class CoursetermFieldListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_term_serializers.CourseTermSerializer
