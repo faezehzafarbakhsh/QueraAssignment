@@ -13,7 +13,8 @@ class StudentRequestSerializer(serializers.ModelSerializer):
 class TeacherAnswerStudentRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = edu_request_models.StudentRequest
-        fields = ['id', 'student.id', 'request_type', 'request_description', 'term', 'course_term.id', 'answer', 'status']
+        fields = ['id', 'student.id', 'request_type', 'request_description',
+                  'term', 'course_term.id', 'answer', 'status']
         extra_kwargs = {
             'id': {'read_only': True},
             'student': {'read_only': True},
@@ -24,10 +25,14 @@ class TeacherAnswerStudentRequestSerializer(serializers.ModelSerializer):
         }
 
 
-
 class EnrollmentCertificateSerializer(serializers.ModelSerializer):
-    model = edu_request_models.EnrollmentCertificate
-    fields = ['student', 'term', 'enrollment_certificate_place',]
+    class Meta:
+        model = edu_request_models.EnrollmentCertificate
+        fields = ['student','term', 'status']
+        extra_kwargs = {
+            'status': {'read_only': True},
+            'student': {'read_only': True},
+            }
 
 
 class TeacherAnswerSerializer(serializers.ModelSerializer):
