@@ -11,7 +11,7 @@ urlpatterns = [
         edu_request_views.StudentRequestListCreateView.as_view(),
         name='student_request_list_create_view'),
     
-    path('student/<int:pk>/courses/<int:course_term_pk>/<int:request_type>/request/',
+    path('student/<int:student_pk>/courses/<int:course_term_pk>/<int:request_type>/request/',
         edu_request_views.StudentRequestListCreateView.as_view(),
         name='student_request_list_create_view'),
     
