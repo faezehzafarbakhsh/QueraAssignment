@@ -62,7 +62,7 @@ class EnrollmentCertificate(models.Model):
                              related_name='enrollment_certificates'
                              )
     enrollment_certificate_place = models.CharField(
-        verbose_name=vn_edu_request.ENROLLMENT_CERTIFICATE_CERTIFICATE_PLACE, max_length=128, )
+        verbose_name=vn_edu_request.ENROLLMENT_CERTIFICATE_CERTIFICATE_PLACE, max_length=128, default=None)
     status = models.IntegerField(choices=StudentRequest.StatusChoices.choices,
                                  verbose_name=vn_edu_request.STUDENT_REQUEST_STATUS, default=3)
 
