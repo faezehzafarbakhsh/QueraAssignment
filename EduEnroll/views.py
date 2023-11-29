@@ -57,8 +57,8 @@ class DetailCourseSelectionView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        if self.request.data.get('pk'):
-            user = User.objects.get(pk=self.request.data['pk'])
+        if self.kwargs.get('pk'):
+            user = User.objects.get(pk=self.kwargs.get('pk'))
         else:
             user = self.request.user
         queryset = enroll_models.StudentCourse.objects.filter(
@@ -71,8 +71,8 @@ class CheckCourseSelectionView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_user(self):
-        if self.request.data.get('pk'):
-            user = User.objects.get(pk=self.request.data['pk'])
+        if self.kwargs.get('pk'):
+            user = User.objects.get(pk=self.kwargs.get('pk'))
         else:
             user = self.request.user
         return user

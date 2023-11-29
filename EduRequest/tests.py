@@ -65,7 +65,8 @@ class StudentRequestTest(APITestCase):
             term_id=self.term.id,
             course_term_id=self.course_term.id,
             request_description="this a appeal request",
-            request_type=4
+            status=2,
+            request_type=1,
         )
         self.url = reverse('student_request_list_create_view',
                            args=[self.course_term.id, 2])

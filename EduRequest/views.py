@@ -12,6 +12,8 @@ from EduTerm import models as edu_term_models
 from django.contrib.auth import get_user_model
 from Identity import permission_classes
 
+User = get_user_model()
+
 
 class EnrollmentCertificateListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_request_serializers.EnrollmentCertificateSerializer
@@ -20,7 +22,6 @@ class EnrollmentCertificateListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return edu_request_models.EnrollmentCertificate.objects.filter(student=self.request.user)
-
 
     def get_serializer(self, *args, **kwargs):
         serializer = super().get_serializer(*args, **kwargs)
@@ -44,22 +45,30 @@ class StudentRequestListCreateView(generics.ListCreateAPIView):
     http_method_names = ['get', 'post']
     permission_classes = (permission_classes.IsStudent,)
 
+    def get_user(self):
+        if self.kwargs.get('student_pk'):
+            user = User.objects.get(pk=self.kwargs.get('student_pk'))
+        else:
+            user = self.request.user
+        return user
+
     def get_queryset(self):
-        return edu_request_models.StudentRequest.objects.filter(student=self.request.user)
+        return edu_request_models.StudentRequest.objects.filter(student=self.get_user())
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         course_term = get_object_or_404(
             edu_term_models.CourseTerm, pk=self.kwargs.get('course_term_pk'))
         request_type = self.kwargs.get('request_type')
-        student = self.request.user
+        student = self.get_user()
         if not student:
             raise Http404
         extra_context = {
             'student': student,
             'term': course_term.term,
             'course_term': course_term,
-            'request_type': request_type
+            'request_type': request_type,
+            'status': 2,
         }
         context.update(extra_context)
         return context
@@ -70,15 +79,23 @@ class StudentRequestListCreateView(generics.ListCreateAPIView):
         serializer.validated_data['term'] = context.get('term')
         serializer.validated_data['course_term'] = context.get('course_term')
         serializer.validated_data['request_type'] = context.get('request_type')
+        serializer.validated_data['status'] = context.get('status')
         return super().perform_create(serializer)
 
 
 class StudentRequestDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = edu_request_serializers.StudentRequestSerializer
     permission_classes = (permission_classes.IsStudent,)
+    
+    def get_user(self):
+        if self.kwargs.get('student_pk'):
+            user = User.objects.get(pk=self.kwargs.get('student_pk'))
+        else:
+            user = self.request.user
+        return user
 
     def get_queryset(self):
-        return edu_request_models.StudentRequest.objects.filter(student=self.request.user)
+        return edu_request_models.StudentRequest.objects.filter(student=self.get_user())
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -95,29 +112,6 @@ class StudentRequestDetailUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVie
         context.update(extra_context)
         return context
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(
-            instance, data=request.data, partial=kwargs.get('partial', False))
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
-
-    def perform_update(self, serializer):
-        serializer.save()
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def perform_destroy(self, instance):
-        instance.delete()
 
 
 # teacher
