@@ -7,15 +7,15 @@ urlpatterns = [
     path('student/enrollment-certificate/<int:pk>/' , edu_request_views.EnrollmentCertificateRetrieveUpdateDestroyView.as_view() , name='enrollment_certificate_retrieve_update_destroy_view'),
     
     # Student Request
-    path('student/me/course_term/<int:course_term_pk>/<int:request_type>/request/',
+    path('student/me/courses/<int:course_term_pk>/<int:request_type>/request/',
         edu_request_views.StudentRequestListCreateView.as_view(),
         name='student_request_list_create_view'),
     
-    path('student/<int:pk>/course_term/<int:course_term_pk>/<int:request_type>/request/',
+    path('student/<int:pk>/courses/<int:course_term_pk>/<int:request_type>/request/',
         edu_request_views.StudentRequestListCreateView.as_view(),
         name='student_request_list_create_view'),
     
-    path('student/me/course_term/<int:course_term_pk>/<int:request_type>/request/<int:pk>/',
+    path('student/me/courses/<int:course_term_pk>/<int:request_type>/request/<int:pk>/',
         edu_request_views.StudentRequestDetailUpdateDestroyView.as_view(),
         name='student_request_detail_update_destroy_view'),
     
