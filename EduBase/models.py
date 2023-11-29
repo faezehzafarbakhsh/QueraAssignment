@@ -1,5 +1,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import Q
+
 from EduBase import variable_names as vn_edu_base
 
 
@@ -53,7 +55,15 @@ class Course(models.Model):
 
 
 class CourseRelationManager(models.Manager):
-    pass
+    def get_pre_request_course_relation(self, course_id):
+        """
+        لیست شناسه دروس پیشنیاز درس انتخابی را برمیگرداند
+        :param course_id:
+        :return:
+        """
+        return self.filter(
+            Q(relation_type=2) & Q(primary_course_id=course_id)
+        ).values_list('secondary_course_id', flat=True)
 
 
 class CourseRelation(models.Model):
