@@ -17,6 +17,10 @@ case "$1" in
     echo "Applying database migrations..."
     python manage.py migrate --noinput
 
+    # Collect static files
+    echo "Collecting static files..."
+    python manage.py collectstatic --noinput
+
     # Start Django app with uWSGI
     echo "Starting Django with uWSGI..."
     exec uwsgi --http :8000 --module QueraPyRate.wsgi
