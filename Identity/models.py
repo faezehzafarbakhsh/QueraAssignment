@@ -9,9 +9,11 @@ from django.db.models import Q
 from Identity import variable_names as vn_identity
 from django_jalali.db import models as jmodels
 from django.contrib.auth import get_user_model
+from django.utils.crypto import get_random_string
 
 
 # Create your user_models here.
+
 
 def user_portrait_dir_path(instance, file_name):
     return 'image/{path}/{id}/{file_name}_{uuid}.{suffix}'.format(
@@ -24,10 +26,11 @@ def user_portrait_dir_path(instance, file_name):
 
 
 class UserManager(UserManager):
-    
+
     def get_student_by_id(self, id):
         query = self.get(id=id, is_student=True)
         return query
+
 
 class User(user_models.AbstractUser):
     class GenderChoices(models.IntegerChoices):
@@ -43,6 +46,8 @@ class User(user_models.AbstractUser):
         EDUCATIONAL_EXEMPTION = 4, vn_identity.EDUCATIONAL_EXEMPTION
         CURRENTLY_IN_SERVICE = 5, vn_identity.CURRENTLY_IN_SERVICE
 
+    unique_code = models.CharField(
+        default=None, max_length=8, unique=True, editable=False, null=True)
     portrait = models.ImageField(upload_to=user_portrait_dir_path, null=True, blank=True,
                                  verbose_name=vn_identity.USER_PORTRAIT)
     mobile = models.CharField(max_length=11, null=True,
@@ -67,6 +72,16 @@ class User(user_models.AbstractUser):
         default=False, verbose_name=vn_identity.USER_IS_TEACHER)
     military_service = models.IntegerField(choices=MilitaryChoices.choices, null=True, blank=True,
                                            verbose_name=vn_identity.USER_MILITARY_SERVICE, default=0)
+
+    def save(self, *args, **kwargs):
+        # Generate a unique code if it's not already set
+        if not self.unique_code:
+            self.unique_code = self._generate_unique_code()
+        super().save(*args, **kwargs)
+
+    def _generate_unique_code(self):
+        prefix = 'su' if self.is_student else 'th' if self.is_teacher else 'ch'
+        return f'{prefix}-{get_random_string(length=5)}'
 
     class Meta:
         unique_together = ('email', 'national_code')
