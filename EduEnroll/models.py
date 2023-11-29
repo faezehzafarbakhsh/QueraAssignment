@@ -55,6 +55,7 @@ class StudentCourse(models.Model):
         ENROLLED = 1, vn_edu_enroll.STUDENT_COURSE_ENROLLED
         DELETED = 2, vn_edu_enroll.STUDENT_COURSE_DELETED
         COMPLETED = 3, vn_edu_enroll.STUDENT_COURSE_COMPLETED
+        ACCEPTED = 4, vn_edu_enroll.STUDENT_COURSE_ACCEPTED
 
     course_term = models.ForeignKey('EduTerm.CourseTerm', on_delete=models.PROTECT,
                                     verbose_name=vn_edu_enroll.STUDENT_COURSE_COURSE_TERM,
