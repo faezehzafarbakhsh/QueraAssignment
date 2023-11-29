@@ -35,7 +35,8 @@ class StudentRequest(models.Model):
                                     related_name='student_requests')
     request_description = models.TextField(verbose_name=vn_edu_request.STUDENT_REQUEST_REQUEST_DESCRIPTION)
     answer = models.TextField(verbose_name=vn_edu_request.STUDENT_REQUEST_ANSWER)
-    status = models.IntegerField(choices=StatusChoices.choices, verbose_name=vn_edu_request.STUDENT_REQUEST_STATUS, default=vn_edu_request.IN_PROGRESS)
+    status = models.IntegerField(choices=StatusChoices.choices, verbose_name=vn_edu_request.STUDENT_REQUEST_STATUS,
+                                 default=vn_edu_request.IN_PROGRESS)
     has_academic_year = models.BooleanField(default=False,
                                             verbose_name=vn_edu_request.STUDENT_REQUEST_HAS_ACADEMIC_YEAR)
     user_answer = models.ForeignKey(get_user_model(), on_delete=models.PROTECT,
@@ -61,6 +62,8 @@ class EnrollmentCertificate(models.Model):
                              related_name='enrollment_certificates'
                              )
     enrollment_certificate_place = models.CharField(
-        verbose_name=vn_edu_request.ENROLLMENT_CERTIFICATE_CERTIFICATE_PLACE, max_length=128, )
+        verbose_name=vn_edu_request.ENROLLMENT_CERTIFICATE_CERTIFICATE_PLACE, max_length=128, default=None)
+    status = models.IntegerField(choices=StudentRequest.StatusChoices.choices,
+                                 verbose_name=vn_edu_request.STUDENT_REQUEST_STATUS, default=3)
 
     objects = EnrollmentCertificateManager()

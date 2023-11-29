@@ -12,11 +12,22 @@ from EduTerm import models as edu_term_models
 from django.contrib.auth import get_user_model
 from Identity import permission_classes
 
-class EnrollmentCertificateListCreateView(generics.ListAPIView):
+
+class EnrollmentCertificateListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_request_serializers.EnrollmentCertificateSerializer
     queryset = edu_request_models.EnrollmentCertificate.objects.all()
-    http_method_names = ['post']
-    permission_classes = (AllowAny,)
+    permission_classes = (permission_classes.IsStudent,)
+
+    def get_queryset(self):
+        return edu_request_models.EnrollmentCertificate.objects.filter(student=self.request.user)
+
+
+    def get_serializer(self, *args, **kwargs):
+        serializer = super().get_serializer(*args, **kwargs)
+        print(self.request.user)
+        serializer.context['student'] = self.request.user
+        serializer.context['status'] = 3
+        return serializer
 
 
 class EnrollmentCertificateRetrieveUpdateDestroyView(generics.RetrieveDestroyAPIView):
@@ -32,7 +43,7 @@ class StudentRequestListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_request_serializers.StudentRequestSerializer
     http_method_names = ['get', 'post']
     permission_classes = (permission_classes.IsStudent,)
-    
+
     def get_queryset(self):
         return edu_request_models.StudentRequest.objects.filter(student=self.request.user)
 
@@ -126,7 +137,7 @@ class TeacherAnswerStudentRequestSerializer(generics.RetrieveUpdateDestroyAPIVie
         if not teacher:
             raise Http404
         extra_context = {
-            'answer_user': teacher, 
+            'answer_user': teacher,
             # Use get with a default value
             'answer': self.request.data.get('answer', ''),
             # Use get with a default value
