@@ -45,7 +45,7 @@ class CoursetermRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView)
 
     def get_queryset(self):
         if self.request.user.is_chancellor:
-            college = self.request.user.college if self.request.user.is_chancellor else None
+            college = self.request.user.college 
 
             if college:
                 queryset = edu_term_models.CourseTerm.objects.filter(
