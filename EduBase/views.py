@@ -4,7 +4,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from EduBase import serializers as edu_base_serializers
 from EduBase import models as edu_base_models
 from Identity import permission_classes
-
+from EduBase import filters as edu_base_filter
+from django_filters import rest_framework as filters
 
 class EduFieldListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_base_serializers.EduFieldSerializer
@@ -26,6 +27,8 @@ class CourseListCreateView(generics.ListCreateAPIView):
     http_method_names = ['get', 'post']
     permission_classes = (
         IsAuthenticated, permission_classes.IsItManager | permission_classes.IsChancellor)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = (edu_base_filter.ListCourseFilter, edu_base_filter.ListCourseTermFilter)
 
 
 class CourseRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
