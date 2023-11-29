@@ -18,7 +18,7 @@ class StudentRequest(models.Model):
         IN_PROGRESS = 3, vn_edu_request.IN_PROGRESS
 
     class RequestTypeChoices(models.IntegerChoices):
-        Late_Add_drop = 1, vn_edu_request.Late_Add_drop
+        LATE_ADD_DROP = 1, vn_edu_request.LATE_ADD_DROP
         EMPLOYMENT_IN_EDUCATION = 2, vn_edu_request.EMPLOYMENT_IN_EDUCATION
         REGISTERING = 3, vn_edu_request.REGISTERING
         APPEAL = 4, vn_edu_request.APPEAL
@@ -35,13 +35,13 @@ class StudentRequest(models.Model):
                                     related_name='student_requests')
     request_description = models.TextField(verbose_name=vn_edu_request.STUDENT_REQUEST_REQUEST_DESCRIPTION)
     answer = models.TextField(verbose_name=vn_edu_request.STUDENT_REQUEST_ANSWER)
-    status = models.IntegerField(choices=StatusChoices.choices, verbose_name=vn_edu_request.STUDENT_REQUEST_STATUS)
+    status = models.IntegerField(choices=StatusChoices.choices, verbose_name=vn_edu_request.STUDENT_REQUEST_STATUS, default=vn_edu_request.IN_PROGRESS)
     has_academic_year = models.BooleanField(default=False,
                                             verbose_name=vn_edu_request.STUDENT_REQUEST_HAS_ACADEMIC_YEAR)
     user_answer = models.ForeignKey(get_user_model(), on_delete=models.PROTECT,
                                     verbose_name=vn_edu_request.STUDENT_REQUEST_USER_ANSWER,
                                     limit_choices_to=Q(is_teacher=True) | Q(is_chancellor=True),
-                                    related_name='student_request_answers')
+                                    related_name='student_request_answers', null=True, blank=True)
     request_type = models.IntegerField(choices=RequestTypeChoices.choices,
                                     verbose_name=vn_edu_request.STUDENT_REQUEST_REQUEST_TYPE)
 

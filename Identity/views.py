@@ -6,15 +6,30 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from django.contrib.auth import logout
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.views import TokenObtainPairView
+from django_filters import rest_framework as filters
 
 from Identity import models as identity_models
 from Identity import serializers as identity_serializers
 from Identity import permission_classes as custom_permissions
-from Identity import custom_classes
+from Identity import custom_classes , tasks 
+from Identity import filters as identity_filters 
+
 
 User = get_user_model()
 
 # Authentication Views
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = identity_serializers.CustomTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 class UserRegisterIView(generics.CreateAPIView):
@@ -193,7 +208,7 @@ class ChangePasswordRequestView(generics.GenericAPIView):
         user = User.objects.get(username=username)
 
         cached_token = custom_classes.CacheManager().set_cache_token(user)
-
+        email = tasks.send_change_password_email(user_email=user.email,token= str(cached_token))
         return Response(
             {'message': 'توکن یکبار مصرف برای تغییر رمز ارسال شد.',
              'change_password_token': str(cached_token)},
@@ -292,7 +307,8 @@ class ItTeacherListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.all()
     http_method_names = ['post', 'get']
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
-
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = identity_filters.TeacherFilter
     def get_queryset(self):
         return User.objects.filter(is_teacher=True)
 
@@ -342,8 +358,9 @@ class ItStudentListCreateView(generics.ListCreateAPIView):
     """
     serializer_class = identity_serializers.ItStudentSerializer
     queryset = User.objects.all()
-    http_method_names = ['post', 'get']
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = identity_filters.StudentFilter
 
     def get_queryset(self):
         return User.objects.filter(is_student=True)
@@ -395,6 +412,8 @@ class ItChancellorListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.all()
     http_method_names = ['post', 'get']
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = identity_filters.ChancellorFilter
 
     def get_queryset(self):
         return User.objects.filter(is_chancellor=True)
@@ -428,10 +447,12 @@ class ChancellorStudentsListView(generics.ListAPIView):
     http_method_names = ['post', 'get']
     permission_classes = (
         IsAuthenticated, custom_permissions.IsItManager | custom_permissions.IsChancellor)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = identity_filters.StudentFilter
 
     def get_queryset(self):
         if self.request.user.is_chancellor:
-            college = self.request.user.college 
+            college = self.request.user.college
 
             if college:
                 queryset = User.objects.filter(
@@ -444,7 +465,6 @@ class ChancellorStudentsListView(generics.ListAPIView):
         return queryset
 
 
-
 class ChancellorStudentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
     serializer_class = identity_serializers.ChancellorStudentSerializer
@@ -453,11 +473,35 @@ class ChancellorStudentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyA
 
     def get_queryset(self):
         if self.request.user.is_chancellor:
-            college = self.request.user.college 
+            college = self.request.user.college
 
             if college:
                 queryset = User.objects.filter(
                     is_student=True, college=college)
+            else:
+                queryset = User.objects.none()
+        else:
+            queryset = User.objects.all()
+
+        return queryset
+
+
+class ChancellorTeacherListView(generics.ListAPIView):
+
+    serializer_class = identity_serializers.ChancellorTeacherSerializer
+    http_method_names = ['post', 'get']
+    permission_classes = (
+        IsAuthenticated, custom_permissions.IsItManager | custom_permissions.IsChancellor)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = identity_filters.TeacherFilter
+
+    def get_queryset(self):
+        if self.request.user.is_chancellor:
+            college = self.request.user.college
+
+            if college:
+                queryset = User.objects.filter(
+                    is_teacher=True, college=college)
             else:
                 queryset = User.objects.none()
         else:
