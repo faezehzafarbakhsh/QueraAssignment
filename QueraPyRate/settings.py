@@ -9,8 +9,18 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv(filename=".env.main"))
+IS_PRODUCTION = int(os.environ.get("IS_PRODUCTION"))
+
+if IS_PRODUCTION:
+    load_dotenv(find_dotenv(filename=".env.production"))
+else:
+    load_dotenv(find_dotenv(filename=".env.development"))
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,18 +29,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^5d)vf!v2s+=s#pqv)jh!my5guusa5s1ev+(1hccuhiz%0j^^m'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+SECRET_KEY = os.environ.get("SECRET_KEY")
+DEBUG = int(os.environ.get("DEBUG"))
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+DEFAULT_DATABASE_HOST = os.environ.get("DEFAULT_DATABASE_HOST")
 
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,6 +45,26 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+OTHER_APPS = [
+    "rest_framework",
+    'rest_framework_simplejwt',
+    'drf_yasg',
+    'django_celery_results',
+    'django_filters',
+
+]
+
+PROJECT_APPS = [
+    'EduBase',
+    'Identity',
+    'EduTerm',
+    'EduEnroll',
+    'EduRequest',
+]
+
+INSTALLED_APPS = [*DJANGO_APPS, *OTHER_APPS, *PROJECT_APPS]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -54,8 +81,7 @@ ROOT_URLCONF = 'QueraPyRate.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -76,9 +102,13 @@ WSGI_APPLICATION = 'QueraPyRate.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'ENGINE': os.environ.get("DEFAULT_DATABASE_ENGINE"),
+        'NAME': os.environ.get("DEFAULT_DATABASE_NAME"),
+        'USER': os.environ.get("DEFAULT_DATABASE_USER"),
+        'PASSWORD': os.environ.get("DEFAULT_DATABASE_PASSWORD"),
+        'HOST': DEFAULT_DATABASE_HOST,
+        'PORT': os.environ.get("DEFAULT_DATABASE_PORT"),
+    },
 }
 
 
@@ -103,22 +133,96 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
-
+LANGUAGE_CODE = os.environ.get("LANGUAGE_CODE")
+TIME_ZONE = os.environ.get("TIME_ZONE")
+USE_I18N = os.environ.get("USE_I18N")
+USE_L10N = os.environ.get("USE_L10N")
+USE_TZ = os.environ.get("USE_TZ")
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = os.environ.get("STATIC_URL")
+STATIC_ROOT = os.path.join(BASE_DIR, os.environ.get("STATIC_ROOT_NAME"))
+MEDIA_DIR = os.path.join(BASE_DIR, os.environ.get("MEDIA_DIR_NAME"))
+MEDIA_URL = os.environ.get("MEDIA_URL")
+MEDIA_ROOT = MEDIA_DIR
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+USE_THOUSAND_SEPARATOR = int(os.environ.get("USE_THOUSAND_SEPARATOR"))
+THOUSAND_SEPARATOR = os.environ.get("THOUSAND_SEPARATOR")
+DECIMAL_SEPARATOR = os.environ.get("DECIMAL_SEPARATOR")
+NUMBER_GROUPING = int(os.environ.get("NUMBER_GROUPING"))
 
+AUTH_USER_MODEL = 'Identity.User'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',)
+
+}
+
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, "locale"),
+)
+
+# Celery configuration
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
+CELERY_RESULT_SERIALIZER = os.environ.get("CELERY_RESULT_SERIALIZER")
+CELERY_TASK_SERIALIZER = os.environ.get("CELERY_TASK_SERIALIZER")
+CELERY_TIMEZONE = os.environ.get("CELERY_TIMEZONE")
+
+# Email
+EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND")
+EMAIL_HOST = os.environ.get("EMAIL_HOST")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS")
+EMAIL_PORT = os.environ.get("EMAIL_PORT")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION':'redis://localhost:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',  # Adjust the logging level as needed
+    },
+    'loggers': {
+        'QueraPyRate': {
+            'handlers': ['console'],
+            'level': 'INFO',  # Adjust the logging level as needed
+            'propagate': True,
+        },
+    },
+}
