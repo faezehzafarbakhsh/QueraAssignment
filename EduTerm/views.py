@@ -18,7 +18,7 @@ class TermListCreateView(generics.ListCreateAPIView):
     http_method_names = ['get', 'post', ]
     permission_classes = (IsAuthenticated, permission_classes.IsItManager)
     filter_backends = (filters.DjangoFilterBackend,)
-    filterset_class = EDUTerm_FILTERS.Termfilters
+    filterset_class = EDUTerm_FILTERS.TermFilters
     
 
 class TermRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -27,7 +27,7 @@ class TermRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     http_method_names = ['get', 'put', 'delete',]
     permission_classes = (IsAuthenticated, permission_classes.IsItManager)
     filter_backends = (filters.DjangoFilterBackend,)
-    filterset_class = EDUTerm_FILTERS.Termfilters
+    filterset_class = EDUTerm_FILTERS.TermFilters
 
 class CoursetermFieldListCreateView(generics.ListCreateAPIView):
     serializer_class = edu_term_serializers.CourseTermSerializer

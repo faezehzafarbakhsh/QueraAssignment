@@ -41,7 +41,7 @@ services:
       - static_volume:/opt/static/
       - media_volume:/opt/media/
     ports:
-      - 8080:80
+      - 80:80
     depends_on:
       - web
 
