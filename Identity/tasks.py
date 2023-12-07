@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@shared_task()
+@shared_task
 def send_change_password_email(user_email, token):
     try:
         logger.info(f"Sending email to {user_email}")

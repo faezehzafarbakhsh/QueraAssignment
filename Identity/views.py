@@ -12,8 +12,8 @@ from django_filters import rest_framework as filters
 from Identity import models as identity_models
 from Identity import serializers as identity_serializers
 from Identity import permission_classes as custom_permissions
-from Identity import custom_classes , tasks 
-from Identity import filters as identity_filters 
+from Identity import custom_classes, tasks
+from Identity import filters as identity_filters
 
 
 User = get_user_model()
@@ -208,7 +208,8 @@ class ChangePasswordRequestView(generics.GenericAPIView):
         user = User.objects.get(username=username)
 
         cached_token = custom_classes.CacheManager().set_cache_token(user)
-        email = tasks.send_change_password_email(user_email=user.email,token= str(cached_token))
+        email = tasks.send_change_password_email(
+            user_email=user.email, token=str(cached_token))
         return Response(
             {'message': 'توکن یکبار مصرف برای تغییر رمز ارسال شد.',
              'change_password_token': str(cached_token)},
@@ -309,6 +310,7 @@ class ItTeacherListCreateView(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated, custom_permissions.IsItManager)
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = identity_filters.TeacherFilter
+
     def get_queryset(self):
         return User.objects.filter(is_teacher=True)
 
