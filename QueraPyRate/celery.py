@@ -10,6 +10,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'QueraPyRate.settings')
 # Create a Celery instance and configure it using the settings from Django
 celery_app = Celery('QueraPyRate')
 
+broker_connection_retry_on_startup = True
 # Load task modules from all registered Django app configs.
 celery_app.config_from_object('django.conf:settings', namespace='CELERY')
 
